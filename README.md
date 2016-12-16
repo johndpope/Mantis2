@@ -3,10 +3,12 @@
 ### Second Generation of the Mantis Game Framework
 
 <img src='mantis.png' width='256' height='256'></img>
-
+<br>
 Mantis is an Apache-liscensed open source game framework based off of LibGDX.
 
-Features include:
+<hr></hr>
+
+<b>Features include:</b>
 
 1. Functional scene graph
 2. Box2D physics backend
