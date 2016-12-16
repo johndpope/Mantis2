@@ -33,12 +33,11 @@ public class Mantis extends ApplicationAdapter {
 	public Mantis(Game game) {
 		// Set the initial game instance
 		currentgame = game;
-		game.create();
 	}
 
 	@Override
 	public void create() {
-
+		currentgame.create();
 	}
 
 	@Override

@@ -6,7 +6,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
 public class Launcher {
 
-	public Mantis launch(Game game, String title, int width, int height, boolean resizable, int samples,
+	public static Mantis launch(Game game, String title, int width, int height, boolean resizable, int samples,
 			String iconPrefix) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = width;
@@ -17,8 +17,8 @@ public class Launcher {
 
 		if (iconPrefix != null) {
 			config.addIcon(iconPrefix + "16.png", FileType.Internal);
-			config.addIcon(iconPrefix + "mantis32.png", FileType.Internal);
-			config.addIcon(iconPrefix + "mantis128.png", FileType.Internal);
+			config.addIcon(iconPrefix + "32.png", FileType.Internal);
+			config.addIcon(iconPrefix + "128.png", FileType.Internal);
 		} else {
 			config.addIcon("mantis16.png", FileType.Internal);
 			config.addIcon("mantis32.png", FileType.Internal);
