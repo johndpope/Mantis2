@@ -780,9 +780,10 @@ public class MScene2D extends Stage {
 	 */
 	public void setLightAlpha(String name, float alpha) {
 		doLater(() -> {
-			Color last = _lights.get(name).getColor();
-			if (_lights.get(name) != null)
+			if (_lights.get(name) != null) {
+				Color last = _lights.get(name).getColor();
 				_lights.get(name).setColor(last.r, last.g, last.b, alpha);
+			}
 		});
 	}
 
@@ -1382,19 +1383,35 @@ public class MScene2D extends Stage {
 	}
 
 	/**
-	 * Gets number of objects that start with a specific string.
+	 * Gets list of object names that start with a specific string.
 	 * 
 	 * @param beginning
 	 *            Beginning to match.
-	 * @return Number of objects with the given beginning.
+	 * @return List of objects with the given beginning.
 	 */
-	public int objectsThatBeginWith(String beginning) {
-		int objectsWithBeginning = 0;
+	public ArrayList<String> objectsThatBeginWith(String beginning) {
+		ArrayList<String> objectsList = new ArrayList<String>();
 		for (String key : _objects.keySet()) {
 			if (key.startsWith(beginning))
-				objectsWithBeginning++;
+				objectsList.add(key);
 		}
-		return objectsWithBeginning;
+		return objectsList;
+	}
+
+	/**
+	 * Gets list of light names that start with a specific string.
+	 * 
+	 * @param beginning
+	 *            Beginning to match.
+	 * @return List of lights with the given beginning.
+	 */
+	public ArrayList<String> lightsThatBeginWith(String beginning) {
+		ArrayList<String> lightList = new ArrayList<String>();
+		for (String key : _lights.keySet()) {
+			if (key.startsWith(beginning))
+				lightList.add(key);
+		}
+		return lightList;
 	}
 
 	/**
