@@ -1568,10 +1568,9 @@ public class MScene2D extends Stage {
 	 *            Delta time scalar.
 	 */
 	public void update(float delta) {
-		final LinkedList<MCallback> dolaterqueue = dlq;
-		while (!dolaterqueue.isEmpty()) {
-			if (dolaterqueue.peek() != null)
-				dolaterqueue.pop().call();
+		while (!dlq.isEmpty()) {
+			if (dlq.peek() != null)
+				dlq.pop().call();
 		}
 		_world.step(1.0f / (60.0f * _timeScale), 1000, 1000);
 		super.act();

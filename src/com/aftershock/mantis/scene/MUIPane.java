@@ -1,7 +1,9 @@
 package com.aftershock.mantis.scene;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
+import com.aftershock.mantis.MCallback;
 import com.aftershock.mantis.scene.util.MUIRef;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -61,6 +63,8 @@ public class MUIPane extends Stage {
 	private HashMap<String, Group> _groups = new HashMap<String, Group>();
 	private HashMap<String, Image> _images = new HashMap<String, Image>();
 
+	private LinkedList<MCallback> dlq = new LinkedList<MCallback>();
+
 	public enum ElementType {
 		BUTTON, SLIDER, PBAR, LABEL, CHECKBOX, GROUP, IMAGE
 	}
@@ -82,17 +86,24 @@ public class MUIPane extends Stage {
 	 *            The width of the font's border.
 	 */
 	public void loadFont(String name, String font, Color fontCol, Color borderCol, int size, int borderWidth) {
-		FreeTypeFontGenerator fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("assets/ui/font/" + font));
-		FreeTypeFontParameter fontParam = new FreeTypeFontParameter();
+		doLater(() -> {
+			FreeTypeFontGenerator fontGenerator = new FreeTypeFontGenerator(
+					Gdx.files.internal("assets/ui/font/" + font));
+			FreeTypeFontParameter fontParam = new FreeTypeFontParameter();
 
-		fontParam.color = fontCol;
-		fontParam.borderColor = borderCol;
-		fontParam.size = size;
-		fontParam.borderWidth = borderWidth;
-		BitmapFont bFont = fontGenerator.generateFont(fontParam);
-		_fonts.put(name, bFont);
-		fontGenerator.dispose();
+			fontParam.color = fontCol;
+			fontParam.borderColor = borderCol;
+			fontParam.size = size;
+			fontParam.borderWidth = borderWidth;
+			BitmapFont bFont = fontGenerator.generateFont(fontParam);
+			_fonts.put(name, bFont);
+			fontGenerator.dispose();
+		});
 	}
+
+	/*
+	 * LABELS
+	 */
 
 	/**
 	 * Creates a new label style.
@@ -103,9 +114,11 @@ public class MUIPane extends Stage {
 	 *            The style's font.
 	 */
 	public void createLabelStyle(String name, String font) {
-		LabelStyle style = new LabelStyle();
-		style.font = _fonts.get(font);
-		_labelStyles.put(name, style);
+		doLater(() -> {
+			LabelStyle style = new LabelStyle();
+			style.font = _fonts.get(font);
+			_labelStyles.put(name, style);
+		});
 	}
 
 	/**
@@ -119,11 +132,13 @@ public class MUIPane extends Stage {
 	 *            The alignment of the label's text.
 	 */
 	public void createLabel(String name, String style, int align) {
-		Label label = new Label("", _labelStyles.get(style));
-		label.setAlignment(align);
-		label.setWrap(true);
-		_labels.put(name, label);
-		addActor(label);
+		doLater(() -> {
+			Label label = new Label("", _labelStyles.get(style));
+			label.setAlignment(align);
+			label.setWrap(true);
+			_labels.put(name, label);
+			addActor(label);
+		});
 	}
 
 	/**
@@ -135,7 +150,9 @@ public class MUIPane extends Stage {
 	 *            The new position of the label.
 	 */
 	public void setLabelPos(String name, Vector2 position) {
-		_labels.get(name).setPosition(position.x, position.y);
+		doLater(() -> {
+			_labels.get(name).setPosition(position.x, position.y);
+		});
 	}
 
 	/**
@@ -149,7 +166,9 @@ public class MUIPane extends Stage {
 	 *            The new Y position of the label.
 	 */
 	public void setLabelPos(String name, float x, float y) {
-		_labels.get(name).setPosition(x, y);
+		doLater(() -> {
+			_labels.get(name).setPosition(x, y);
+		});
 	}
 
 	/**
@@ -161,7 +180,9 @@ public class MUIPane extends Stage {
 	 *            The size of the label.
 	 */
 	public void setLabelSize(String name, Vector2 size) {
-		_labels.get(name).setSize(size.x, size.y);
+		doLater(() -> {
+			_labels.get(name).setSize(size.x, size.y);
+		});
 	}
 
 	/**
@@ -175,7 +196,9 @@ public class MUIPane extends Stage {
 	 *            The new height of the label.
 	 */
 	public void setLabelSize(String name, float w, float h) {
-		_labels.get(name).setSize(w, h);
+		doLater(() -> {
+			_labels.get(name).setSize(w, h);
+		});
 	}
 
 	/**
@@ -187,7 +210,38 @@ public class MUIPane extends Stage {
 	 *            The new text of the label.
 	 */
 	public void setLabelText(String name, String text) {
-		_labels.get(name).setText(text);
+		doLater(() -> {
+			_labels.get(name).setText(text);
+		});
+	}
+
+	/**
+	 * Sets the visibility of a label.
+	 * 
+	 * @param name
+	 *            The name of the label to modify.
+	 * @param vis
+	 *            Whether or not to show the label.
+	 */
+	public void setLabelVisible(String name, boolean vis) {
+		doLater(() -> {
+			_labels.get(name).setVisible(vis);
+		});
+	}
+
+	/**
+	 * Sets the opacity of a label.
+	 * 
+	 * @param name
+	 *            The name of the label to modify.
+	 * @param opacity
+	 *            The new opacity of the label.
+	 */
+	public void setLabelOpacity(String name, float opacity) {
+		doLater(() -> {
+			Color col = _labels.get(name).getColor();
+			_labels.get(name).setColor(col.r, col.g, col.b, opacity);
+		});
 	}
 
 	/**
@@ -213,16 +267,6 @@ public class MUIPane extends Stage {
 	}
 
 	/**
-	 * Removes a label from the pane.
-	 * 
-	 * @param name
-	 *            The name of the label to remove.
-	 */
-	public void removeLabel(String name) {
-		_labels.get(name).remove();
-	}
-
-	/**
 	 * Gets the position of a label.
 	 * 
 	 * @param name
@@ -231,31 +275,6 @@ public class MUIPane extends Stage {
 	 */
 	public Vector2 getLabelPos(String name) {
 		return new Vector2(_labels.get(name).getX(), _labels.get(name).getY());
-	}
-
-	/**
-	 * Sets the visibility of a label.
-	 * 
-	 * @param name
-	 *            The name of the label to modify.
-	 * @param vis
-	 *            Whether or not to show the label.
-	 */
-	public void setLabelVisible(String name, boolean vis) {
-		_labels.get(name).setVisible(vis);
-	}
-
-	/**
-	 * Sets the opacity of a label.
-	 * 
-	 * @param name
-	 *            The name of the label to modify.
-	 * @param opacity
-	 *            The new opacity of the label.
-	 */
-	public void setLabelOpacity(String name, float opacity) {
-		Color col = _labels.get(name).getColor();
-		_labels.get(name).setColor(col.r, col.g, col.b, opacity);
 	}
 
 	/**
@@ -281,10 +300,26 @@ public class MUIPane extends Stage {
 	}
 
 	/**
-	 * Creates a label style.
+	 * Removes a label from the pane.
 	 * 
 	 * @param name
-	 *            The name of the label style.
+	 *            The name of the label to remove.
+	 */
+	public void removeLabel(String name) {
+		doLater(() -> {
+			_labels.get(name).remove();
+		});
+	}
+
+	/*
+	 * BUTTONS
+	 */
+
+	/**
+	 * Creates a button style.
+	 * 
+	 * @param name
+	 *            The name of the button style.
 	 * @param drawableUp
 	 *            The unpressed drawable of the button.
 	 * @param drawableDown
@@ -293,15 +328,17 @@ public class MUIPane extends Stage {
 	 *            The font of the button style.
 	 */
 	public void createButtonStyle(String name, String drawableUp, String drawableDown, String font) {
-		TextureRegion drawableUpTexReg = new TextureRegion(
-				new Texture(Gdx.files.internal("assets/ui/button/" + drawableUp)));
-		TextureRegion drawableDownTexReg = new TextureRegion(
-				new Texture(Gdx.files.internal("assets/ui/button/" + drawableDown)));
+		doLater(() -> {
+			TextureRegion drawableUpTexReg = new TextureRegion(
+					new Texture(Gdx.files.internal("assets/ui/button/" + drawableUp)));
+			TextureRegion drawableDownTexReg = new TextureRegion(
+					new Texture(Gdx.files.internal("assets/ui/button/" + drawableDown)));
 
-		TextButtonStyle bStyle = new TextButtonStyle(new TextureRegionDrawable(drawableUpTexReg),
-				new TextureRegionDrawable(drawableDownTexReg), new TextureRegionDrawable(drawableUpTexReg),
-				_fonts.get(font));
-		_buttonStyles.put(name, bStyle);
+			TextButtonStyle bStyle = new TextButtonStyle(new TextureRegionDrawable(drawableUpTexReg),
+					new TextureRegionDrawable(drawableDownTexReg), new TextureRegionDrawable(drawableUpTexReg),
+					_fonts.get(font));
+			_buttonStyles.put(name, bStyle);
+		});
 	}
 
 	/**
@@ -319,19 +356,21 @@ public class MUIPane extends Stage {
 	 *            Whether or not to create a toggle button style.
 	 */
 	public void createButtonStyle(String name, String drawableUp, String drawableDown, String font, boolean toggle) {
-		if (toggle) {
-			TextureRegion drawableUpTexReg = new TextureRegion(
-					new Texture(Gdx.files.internal("assets/ui/button/" + drawableUp)));
-			TextureRegion drawableDownTexReg = new TextureRegion(
-					new Texture(Gdx.files.internal("assets/ui/button/" + drawableDown)));
+		doLater(() -> {
+			if (toggle) {
+				TextureRegion drawableUpTexReg = new TextureRegion(
+						new Texture(Gdx.files.internal("assets/ui/button/" + drawableUp)));
+				TextureRegion drawableDownTexReg = new TextureRegion(
+						new Texture(Gdx.files.internal("assets/ui/button/" + drawableDown)));
 
-			TextButtonStyle bStyle = new TextButtonStyle(new TextureRegionDrawable(drawableUpTexReg),
-					new TextureRegionDrawable(drawableDownTexReg), new TextureRegionDrawable(drawableDownTexReg),
-					_fonts.get(font));
-			_buttonStyles.put(name, bStyle);
-		} else {
-			createButtonStyle(name, drawableUp, drawableDown, font);
-		}
+				TextButtonStyle bStyle = new TextButtonStyle(new TextureRegionDrawable(drawableUpTexReg),
+						new TextureRegionDrawable(drawableDownTexReg), new TextureRegionDrawable(drawableDownTexReg),
+						_fonts.get(font));
+				_buttonStyles.put(name, bStyle);
+			} else {
+				createButtonStyle(name, drawableUp, drawableDown, font);
+			}
+		});
 	}
 
 	/**
@@ -345,10 +384,12 @@ public class MUIPane extends Stage {
 	 *            The text of the button.
 	 */
 	public void createButton(String name, String style, String text) {
-		TextButton button = new TextButton(text, _buttonStyles.get(style));
-		button.setName(name);
-		_buttons.put(name, button);
-		addActor(button);
+		doLater(() -> {
+			TextButton button = new TextButton(text, _buttonStyles.get(style));
+			button.setName(name);
+			_buttons.put(name, button);
+			addActor(button);
+		});
 	}
 
 	/**
@@ -360,7 +401,23 @@ public class MUIPane extends Stage {
 	 *            The new alignment to be set.
 	 */
 	public void setButtonLabelAlign(String name, int align) {
-		_buttons.get(name).getLabel().setAlignment(align);
+		doLater(() -> {
+			_buttons.get(name).getLabel().setAlignment(align);
+		});
+	}
+
+	/**
+	 * Sets whether a button processes input.
+	 * 
+	 * @param name
+	 *            The name of the button to modify.
+	 * @param active
+	 *            Whether or not the button should process input.
+	 */
+	public void setButtonActive(String name, boolean active) {
+		doLater(() -> {
+			_buttons.get(name).setTouchable((active) ? Touchable.enabled : Touchable.disabled);
+		});
 	}
 
 	/**
@@ -378,7 +435,9 @@ public class MUIPane extends Stage {
 	 *            Bottom padding.
 	 */
 	public void setButtonPad(String name, float padLeft, float padRight, float padTop, float padBottom) {
-		_buttons.get(name).pad(padTop, padLeft, padBottom, padRight);
+		doLater(() -> {
+			_buttons.get(name).pad(padTop, padLeft, padBottom, padRight);
+		});
 	}
 
 	/**
@@ -390,7 +449,9 @@ public class MUIPane extends Stage {
 	 *            The opacity to set.
 	 */
 	public void setButtonOpacity(String name, float opacity) {
-		_buttons.get(name).setColor(1.0f, 1.0f, 1.0f, opacity);
+		doLater(() -> {
+			_buttons.get(name).setColor(1.0f, 1.0f, 1.0f, opacity);
+		});
 	}
 
 	/**
@@ -402,7 +463,9 @@ public class MUIPane extends Stage {
 	 *            The listener to set.
 	 */
 	public void addButtonListener(String name, MUIInputHandler listener) {
-		_buttons.get(name).addListener(new MUIInputListener(listener));
+		doLater(() -> {
+			_buttons.get(name).addListener(new MUIInputListener(listener));
+		});
 	}
 
 	/**
@@ -414,7 +477,9 @@ public class MUIPane extends Stage {
 	 *            The position to set.
 	 */
 	public void setButtonPos(String name, Vector2 pos) {
-		_buttons.get(name).setPosition(pos.x, pos.y);
+		doLater(() -> {
+			_buttons.get(name).setPosition(pos.x, pos.y);
+		});
 	}
 
 	/**
@@ -428,7 +493,9 @@ public class MUIPane extends Stage {
 	 *            The new Y position of the button.
 	 */
 	public void setButtonPos(String name, float x, float y) {
-		_buttons.get(name).setPosition(x, y);
+		doLater(() -> {
+			_buttons.get(name).setPosition(x, y);
+		});
 	}
 
 	/**
@@ -440,7 +507,9 @@ public class MUIPane extends Stage {
 	 *            The size to set.
 	 */
 	public void setButtonSize(String name, Vector2 size) {
-		_buttons.get(name).setSize(size.x, size.y);
+		doLater(() -> {
+			_buttons.get(name).setSize(size.x, size.y);
+		});
 	}
 
 	/**
@@ -452,18 +521,9 @@ public class MUIPane extends Stage {
 	 *            Whether or not the given button is checked.
 	 */
 	public void setButtonValue(String name, boolean value) {
-		_buttons.get(name).setChecked(value);
-	}
-
-	/**
-	 * Checks whether or not a button is toggled.
-	 * 
-	 * @param name
-	 *            The name of the button to poll.
-	 * @return Whether or not the given button is toggled.
-	 */
-	public boolean getButtonValue(String name) {
-		return _buttons.get(name).isChecked();
+		doLater(() -> {
+			_buttons.get(name).setChecked(value);
+		});
 	}
 
 	/**
@@ -477,7 +537,9 @@ public class MUIPane extends Stage {
 	 *            The new height of the button.
 	 */
 	public void setButtonSize(String name, float w, float h) {
-		_buttons.get(name).setSize(w, h);
+		doLater(() -> {
+			_buttons.get(name).setSize(w, h);
+		});
 	}
 
 	/**
@@ -489,7 +551,34 @@ public class MUIPane extends Stage {
 	 *            The text to set.
 	 */
 	public void setButtonText(String name, String text) {
-		_buttons.get(name).setText(text);
+		doLater(() -> {
+			_buttons.get(name).setText(text);
+		});
+	}
+
+	/**
+	 * Sets the visibility of a button.
+	 * 
+	 * @param name
+	 *            The name of the button to modify.
+	 * @param vis
+	 *            The new visibility of the button.
+	 */
+	public void setButtonVisible(String name, boolean vis) {
+		doLater(() -> {
+			_buttons.get(name).setVisible(vis);
+		});
+	}
+
+	/**
+	 * Checks whether or not a button is toggled.
+	 * 
+	 * @param name
+	 *            The name of the button to poll.
+	 * @return Whether or not the given button is toggled.
+	 */
+	public boolean getButtonValue(String name) {
+		return _buttons.get(name).isChecked();
 	}
 
 	/**
@@ -515,6 +604,17 @@ public class MUIPane extends Stage {
 	}
 
 	/**
+	 * Checks whether or not a button processes input.
+	 * 
+	 * @param name
+	 *            The name of the button to poll.
+	 * @return Whether or not the given button processes input.
+	 */
+	public boolean getButtonActive(String name) {
+		return _buttons.get(name).isTouchable();
+	}
+
+	/**
 	 * Gets the size of a button.
 	 * 
 	 * @param name
@@ -537,18 +637,6 @@ public class MUIPane extends Stage {
 	}
 
 	/**
-	 * Sets the visibility of a button.
-	 * 
-	 * @param name
-	 *            The name of the button to modify.
-	 * @param vis
-	 *            The new visibility of the button.
-	 */
-	public void setButtonVisible(String name, boolean vis) {
-		_buttons.get(name).setVisible(vis);
-	}
-
-	/**
 	 * Gets the visibility of the button.
 	 * 
 	 * @param name
@@ -566,9 +654,15 @@ public class MUIPane extends Stage {
 	 *            The button to remove.
 	 */
 	public void removeButton(String name) {
-		_buttons.get(name).remove();
-		_buttons.remove(name);
+		doLater(() -> {
+			_buttons.get(name).remove();
+			_buttons.remove(name);
+		});
 	}
+
+	/*
+	 * PROGRESS BARS
+	 */
 
 	/**
 	 * Creates a progress bar style.
@@ -581,14 +675,18 @@ public class MUIPane extends Stage {
 	 *            The knob drawable for the progress bar.
 	 */
 	public void createProgressBarStyle(String name, String drawable, String knob) {
-		TextureRegion pbarbg = new TextureRegion(new Texture(Gdx.files.internal("assets/ui/progressbar/" + drawable)));
-		TextureRegion pbarknob = new TextureRegion(new Texture(Gdx.files.internal("assets/ui/progressbar/" + knob)));
-		ProgressBarStyle pbStyle = new ProgressBarStyle();
-		pbStyle.knob = new TextureRegionDrawable(pbarknob);
-		pbStyle.knobBefore = new TextureRegionDrawable(pbarknob);
-		pbStyle.background = new TextureRegionDrawable(pbarbg);
+		doLater(() -> {
+			TextureRegion pbarbg = new TextureRegion(
+					new Texture(Gdx.files.internal("assets/ui/progressbar/" + drawable)));
+			TextureRegion pbarknob = new TextureRegion(
+					new Texture(Gdx.files.internal("assets/ui/progressbar/" + knob)));
+			ProgressBarStyle pbStyle = new ProgressBarStyle();
+			pbStyle.knob = new TextureRegionDrawable(pbarknob);
+			pbStyle.knobBefore = new TextureRegionDrawable(pbarknob);
+			pbStyle.background = new TextureRegionDrawable(pbarbg);
 
-		_pbarStyles.put(name, pbStyle);
+			_pbarStyles.put(name, pbStyle);
+		});
 	}
 
 	/**
@@ -611,12 +709,14 @@ public class MUIPane extends Stage {
 	 */
 	public void createProgressBar(String name, String style, float min, float max, float step, float defaultVal,
 			boolean vertical) {
-		ProgressBar pbar = new ProgressBar(min, max, step, vertical, _pbarStyles.get(style));
-		pbar.setName(name);
-		pbar.setValue(defaultVal);
-		_pbars.put(name, pbar);
-		_pbarorients.put(name, vertical);
-		addActor(pbar);
+		doLater(() -> {
+			ProgressBar pbar = new ProgressBar(min, max, step, vertical, _pbarStyles.get(style));
+			pbar.setName(name);
+			pbar.setValue(defaultVal);
+			_pbars.put(name, pbar);
+			_pbarorients.put(name, vertical);
+			addActor(pbar);
+		});
 	}
 
 	/**
@@ -628,7 +728,9 @@ public class MUIPane extends Stage {
 	 *            The opacity to set.s
 	 */
 	public void setProgressBarOpacity(String name, float opacity) {
-		_pbars.get(name).setColor(1.0f, 1.0f, 1.0f, opacity);
+		doLater(() -> {
+			_pbars.get(name).setColor(1.0f, 1.0f, 1.0f, opacity);
+		});
 	}
 
 	/**
@@ -640,7 +742,9 @@ public class MUIPane extends Stage {
 	 *            The value of the given progress bar.
 	 */
 	public void setProgressBarValue(String name, float val) {
-		_pbars.get(name).setValue(val);
+		doLater(() -> {
+			_pbars.get(name).setValue(val);
+		});
 	}
 
 	/**
@@ -652,7 +756,9 @@ public class MUIPane extends Stage {
 	 *            The position to set.
 	 */
 	public void setProgressBarPos(String name, Vector2 pos) {
-		_pbars.get(name).setPosition(pos.x, pos.y);
+		doLater(() -> {
+			_pbars.get(name).setPosition(pos.x, pos.y);
+		});
 	}
 
 	/**
@@ -666,7 +772,9 @@ public class MUIPane extends Stage {
 	 *            The new Y position of the progress bar.
 	 */
 	public void setProgressBarPos(String name, float x, float y) {
-		_pbars.get(name).setPosition(x, y);
+		doLater(() -> {
+			_pbars.get(name).setPosition(x, y);
+		});
 	}
 
 	/**
@@ -678,7 +786,9 @@ public class MUIPane extends Stage {
 	 *            The size to set.
 	 */
 	public void setProgressBarSize(String name, Vector2 size) {
-		setProgressBarSize(name, size.x, size.y);
+		doLater(() -> {
+			setProgressBarSize(name, size.x, size.y);
+		});
 	}
 
 	/**
@@ -692,16 +802,32 @@ public class MUIPane extends Stage {
 	 *            The new height of the progress bar.
 	 */
 	public void setProgressBarSize(String name, float w, float h) {
-		_pbars.get(name).getStyle().background.setMinWidth(w);
-		_pbars.get(name).getStyle().background.setMinHeight(h);
-		if (_pbarorients.get(name))
-			_pbars.get(name).getStyle().knob.setMinWidth(w);
-		else
-			_pbars.get(name).getStyle().knob.setMinHeight(h);
-		_pbars.get(name).getStyle().knobBefore.setMinWidth(w);
-		_pbars.get(name).getStyle().knobBefore.setMinHeight(h);
-		_pbars.get(name).setWidth(w);
-		_pbars.get(name).setHeight(h);
+		doLater(() -> {
+			_pbars.get(name).getStyle().background.setMinWidth(w);
+			_pbars.get(name).getStyle().background.setMinHeight(h);
+			if (_pbarorients.get(name))
+				_pbars.get(name).getStyle().knob.setMinWidth(w);
+			else
+				_pbars.get(name).getStyle().knob.setMinHeight(h);
+			_pbars.get(name).getStyle().knobBefore.setMinWidth(w);
+			_pbars.get(name).getStyle().knobBefore.setMinHeight(h);
+			_pbars.get(name).setWidth(w);
+			_pbars.get(name).setHeight(h);
+		});
+	}
+
+	/**
+	 * Sets the visibility of a progress bar.
+	 * 
+	 * @param name
+	 *            The name of the progress bar to set.
+	 * @param vis
+	 *            The visibility to set.
+	 */
+	public void setProgressBarVisible(String name, boolean vis) {
+		doLater(() -> {
+			_pbars.get(name).setVisible(vis);
+		});
 	}
 
 	/**
@@ -749,18 +875,6 @@ public class MUIPane extends Stage {
 	}
 
 	/**
-	 * Sets the visibility of a progress bar.
-	 * 
-	 * @param name
-	 *            The name of the progress bar to set.
-	 * @param vis
-	 *            The visibility to set.
-	 */
-	public void setProgressBarVisible(String name, boolean vis) {
-		_pbars.get(name).setVisible(vis);
-	}
-
-	/**
 	 * Gets the visibility of a progress bar.
 	 * 
 	 * @param name
@@ -778,10 +892,16 @@ public class MUIPane extends Stage {
 	 *            The name of the progress bar to remove.
 	 */
 	public void removeProgressBar(String name) {
-		_pbars.get(name).remove();
-		_pbars.remove(name);
-		_pbarorients.remove(name);
+		doLater(() -> {
+			_pbars.get(name).remove();
+			_pbars.remove(name);
+			_pbarorients.remove(name);
+		});
 	}
+
+	/*
+	 * SLIDERS
+	 */
 
 	/**
 	 * Creates a slider style.
@@ -794,12 +914,14 @@ public class MUIPane extends Stage {
 	 *            The knob drawable of the slider.
 	 */
 	public void createSliderStyle(String name, String drawable, String knob) {
-		SliderStyle sliderStyle = new SliderStyle(
-				new TextureRegionDrawable(
-						new TextureRegion(new Texture(Gdx.files.internal("assets/ui/slider/" + drawable)))),
-				new TextureRegionDrawable(
-						new TextureRegion(new Texture(Gdx.files.internal("assets/ui/slider/" + knob)))));
-		_sliderStyles.put(name, sliderStyle);
+		doLater(() -> {
+			SliderStyle sliderStyle = new SliderStyle(
+					new TextureRegionDrawable(
+							new TextureRegion(new Texture(Gdx.files.internal("assets/ui/slider/" + drawable)))),
+					new TextureRegionDrawable(
+							new TextureRegion(new Texture(Gdx.files.internal("assets/ui/slider/" + knob)))));
+			_sliderStyles.put(name, sliderStyle);
+		});
 	}
 
 	/**
@@ -822,11 +944,13 @@ public class MUIPane extends Stage {
 	 */
 	public void createSlider(String name, String style, float defaultVal, float min, float max, float stepSize,
 			boolean vertical) {
-		Slider slider = new Slider(min, max, stepSize, vertical, _sliderStyles.get(style));
-		slider.setName(name);
-		slider.setValue(defaultVal);
-		_sliders.put(name, slider);
-		addActor(slider);
+		doLater(() -> {
+			Slider slider = new Slider(min, max, stepSize, vertical, _sliderStyles.get(style));
+			slider.setName(name);
+			slider.setValue(defaultVal);
+			_sliders.put(name, slider);
+			addActor(slider);
+		});
 	}
 
 	/**
@@ -838,7 +962,9 @@ public class MUIPane extends Stage {
 	 *            The opacity to set.
 	 */
 	public void setSliderOpacity(String name, float opacity) {
-		_sliders.get(name).setColor(1.0f, 1.0f, 1.0f, opacity);
+		doLater(() -> {
+			_sliders.get(name).setColor(1.0f, 1.0f, 1.0f, opacity);
+		});
 	}
 
 	/**
@@ -850,7 +976,23 @@ public class MUIPane extends Stage {
 	 *            The value to set.
 	 */
 	public void setSliderValue(String name, float val) {
-		_sliders.get(name).setValue(val);
+		doLater(() -> {
+			_sliders.get(name).setValue(val);
+		});
+	}
+
+	/**
+	 * Sets whether a slider processes input.
+	 * 
+	 * @param name
+	 *            The name of the slider to modify.
+	 * @param active
+	 *            Whether or not the slider should process input.
+	 */
+	public void setSliderActive(String name, boolean active) {
+		doLater(() -> {
+			_sliders.get(name).setTouchable((active) ? Touchable.enabled : Touchable.disabled);
+		});
 	}
 
 	/**
@@ -862,7 +1004,9 @@ public class MUIPane extends Stage {
 	 *            The position to set.
 	 */
 	public void setSliderPos(String name, Vector2 pos) {
-		_sliders.get(name).setPosition(pos.x, pos.y);
+		doLater(() -> {
+			_sliders.get(name).setPosition(pos.x, pos.y);
+		});
 	}
 
 	/**
@@ -876,7 +1020,9 @@ public class MUIPane extends Stage {
 	 *            The new Y position.
 	 */
 	public void setSliderPos(String name, float x, float y) {
-		_sliders.get(name).setPosition(x, y);
+		doLater(() -> {
+			_sliders.get(name).setPosition(x, y);
+		});
 	}
 
 	/**
@@ -888,7 +1034,9 @@ public class MUIPane extends Stage {
 	 *            The size to set.
 	 */
 	public void setSliderSize(String name, Vector2 size) {
-		_sliders.get(name).setSize(size.x, size.y);
+		doLater(() -> {
+			_sliders.get(name).setSize(size.x, size.y);
+		});
 	}
 
 	/**
@@ -902,7 +1050,23 @@ public class MUIPane extends Stage {
 	 *            The new height of the slider.
 	 */
 	public void setSliderSize(String name, float w, float h) {
-		_sliders.get(name).setSize(w, h);
+		doLater(() -> {
+			_sliders.get(name).setSize(w, h);
+		});
+	}
+
+	/**
+	 * Sets the visibility of a slider.
+	 * 
+	 * @param name
+	 *            The name of the slider to modify.
+	 * @param vis
+	 *            The visibility to set.
+	 */
+	public void setSliderVisible(String name, boolean vis) {
+		doLater(() -> {
+			_sliders.get(name).setVisible(vis);
+		});
 	}
 
 	/**
@@ -950,18 +1114,6 @@ public class MUIPane extends Stage {
 	}
 
 	/**
-	 * Sets the visibility of a slider.
-	 * 
-	 * @param name
-	 *            The name of the slider to modify.
-	 * @param vis
-	 *            The visibility to set.
-	 */
-	public void setSliderVisible(String name, boolean vis) {
-		_sliders.get(name).setVisible(vis);
-	}
-
-	/**
 	 * Gets the visibility of a slider.
 	 * 
 	 * @param name
@@ -973,14 +1125,27 @@ public class MUIPane extends Stage {
 	}
 
 	/**
+	 * Checks whether or not a slider processes input.
+	 * 
+	 * @param name
+	 *            The name of the slider to poll.
+	 * @return Whether or not the given slider processes input.
+	 */
+	public boolean getSliderActive(String name) {
+		return _sliders.get(name).isTouchable();
+	}
+
+	/**
 	 * Removes a slider from the pane.
 	 * 
 	 * @param name
 	 *            The name of the slider to remove.
 	 */
 	public void removeSlider(String name) {
-		_sliders.get(name).remove();
-		_sliders.remove(name);
+		doLater(() -> {
+			_sliders.get(name).remove();
+			_sliders.remove(name);
+		});
 	}
 
 	/**
@@ -992,8 +1157,14 @@ public class MUIPane extends Stage {
 	 *            The listener to add.
 	 */
 	public void addSliderListener(String name, MUIInputHandler listener) {
-		_sliders.get(name).addListener(new MUIInputListener(listener));
+		doLater(() -> {
+			_sliders.get(name).addListener(new MUIInputListener(listener));
+		});
 	}
+
+	/*
+	 * CHECKBOXES
+	 */
 
 	/**
 	 * Creates a checkbox style.
@@ -1008,13 +1179,15 @@ public class MUIPane extends Stage {
 	 *            The unchecked drawable.
 	 */
 	public void createCheckboxStyle(String name, String checkbox, String check, String checkOff) {
-		CheckBoxStyle cbStyle = new CheckBoxStyle(
-				new TextureRegionDrawable(
-						new TextureRegion(new Texture(Gdx.files.internal("assets/ui/checkbox/" + checkOff)))),
-				new TextureRegionDrawable(
-						new TextureRegion(new Texture(Gdx.files.internal("assets/ui/checkbox/" + check)))),
-				new BitmapFont(), Color.BLACK);
-		_checkboxStyles.put(name, cbStyle);
+		doLater(() -> {
+			CheckBoxStyle cbStyle = new CheckBoxStyle(
+					new TextureRegionDrawable(
+							new TextureRegion(new Texture(Gdx.files.internal("assets/ui/checkbox/" + checkOff)))),
+					new TextureRegionDrawable(
+							new TextureRegion(new Texture(Gdx.files.internal("assets/ui/checkbox/" + check)))),
+					new BitmapFont(), Color.BLACK);
+			_checkboxStyles.put(name, cbStyle);
+		});
 	}
 
 	/**
@@ -1028,9 +1201,11 @@ public class MUIPane extends Stage {
 	 *            The default value of the checkbox.
 	 */
 	public void createCheckbox(String name, String style, boolean defaultVal) {
-		CheckBox cb = new CheckBox("", _checkboxStyles.get(style));
-		_checkboxes.put(name, cb);
-		addActor(cb);
+		doLater(() -> {
+			CheckBox cb = new CheckBox("", _checkboxStyles.get(style));
+			_checkboxes.put(name, cb);
+			addActor(cb);
+		});
 	}
 
 	/**
@@ -1042,7 +1217,9 @@ public class MUIPane extends Stage {
 	 *            The new opacity of the checkbox.
 	 */
 	public void setCheckboxOpacity(String name, float opacity) {
-		_checkboxes.get(name).setColor(1.0f, 1.0f, 1.0f, opacity);
+		doLater(() -> {
+			_checkboxes.get(name).setColor(1.0f, 1.0f, 1.0f, opacity);
+		});
 	}
 
 	/**
@@ -1054,7 +1231,9 @@ public class MUIPane extends Stage {
 	 *            The new position of the checkbox.
 	 */
 	public void setCheckboxPos(String name, Vector2 pos) {
-		_checkboxes.get(name).setPosition(pos.x, pos.y);
+		doLater(() -> {
+			_checkboxes.get(name).setPosition(pos.x, pos.y);
+		});
 	}
 
 	/**
@@ -1068,7 +1247,9 @@ public class MUIPane extends Stage {
 	 *            The new Y position.
 	 */
 	public void setCheckboxPos(String name, float x, float y) {
-		_checkboxes.get(name).setPosition(x, y);
+		doLater(() -> {
+			_checkboxes.get(name).setPosition(x, y);
+		});
 	}
 
 	/**
@@ -1080,7 +1261,67 @@ public class MUIPane extends Stage {
 	 *            The new value of the given checkbox.
 	 */
 	public void setCheckboxValue(String name, boolean value) {
-		_checkboxes.get(name).setChecked(value);
+		doLater(() -> {
+			_checkboxes.get(name).setChecked(value);
+		});
+	}
+
+	/**
+	 * Sets the size of a checkbox.
+	 * 
+	 * @param name
+	 *            The name of the checkbox to modify.
+	 * @param size
+	 *            The new size of the checkbox.
+	 */
+	public void setCheckboxSize(String name, Vector2 size) {
+		doLater(() -> {
+			_checkboxes.get(name).setSize(size.x, size.y);
+		});
+	}
+
+	/**
+	 * Sets the size of a checkbox.
+	 * 
+	 * @param name
+	 *            The name of the checkbox to modify.
+	 * @param w
+	 *            The new width of the checkbox.
+	 * @param h
+	 *            The new height of the checkbox.
+	 */
+	public void setCheckboxSize(String name, float w, float h) {
+		doLater(() -> {
+			_checkboxes.get(name).setSize(w, h);
+		});
+	}
+
+	/**
+	 * Sets the visibility of a checkbox.
+	 * 
+	 * @param name
+	 *            The name of the checkbox to modify.
+	 * @param vis
+	 *            The visibility to set.
+	 */
+	public void setCheckboxVisible(String name, boolean vis) {
+		doLater(() -> {
+			_checkboxes.get(name).setVisible(vis);
+		});
+	}
+
+	/**
+	 * Sets whether a checkbox processes input.
+	 * 
+	 * @param name
+	 *            The name of the checkbox to modify.
+	 * @param active
+	 *            Whether or not the checkbox should process input.
+	 */
+	public void setCheckboxActive(String name, boolean active) {
+		doLater(() -> {
+			_checkboxes.get(name).setTouchable((active) ? Touchable.enabled : Touchable.disabled);
+		});
 	}
 
 	/**
@@ -1095,29 +1336,14 @@ public class MUIPane extends Stage {
 	}
 
 	/**
-	 * Sets the size of a checkbox.
+	 * Checks whether or not a checkbox processes input.
 	 * 
 	 * @param name
-	 *            The name of the checkbox to modify.
-	 * @param size
-	 *            The new size of the checkbox.
+	 *            The name of the checkbox to poll.
+	 * @return Whether or not the given checkbox processes input.
 	 */
-	public void setCheckboxSize(String name, Vector2 size) {
-		_checkboxes.get(name).setSize(size.x, size.y);
-	}
-
-	/**
-	 * Sets the size of a checkbox.
-	 * 
-	 * @param name
-	 *            The name of the checkbox to modify.
-	 * @param w
-	 *            The new width of the checkbox.
-	 * @param h
-	 *            The new height of the checkbox.
-	 */
-	public void setCheckboxSize(String name, float w, float h) {
-		_checkboxes.get(name).setSize(w, h);
+	public boolean getCheckboxActive(String name) {
+		return _checkboxes.get(name).isTouchable();
 	}
 
 	/**
@@ -1154,18 +1380,6 @@ public class MUIPane extends Stage {
 	}
 
 	/**
-	 * Sets the visibility of a checkbox.
-	 * 
-	 * @param name
-	 *            The name of the checkbox to modify.
-	 * @param vis
-	 *            The visibility to set.
-	 */
-	public void setCheckboxVisible(String name, boolean vis) {
-		_checkboxes.get(name).setVisible(vis);
-	}
-
-	/**
 	 * Gets the visibility of a checkbox.
 	 * 
 	 * @param name
@@ -1177,15 +1391,33 @@ public class MUIPane extends Stage {
 	}
 
 	/**
+	 * Adds a listener to checkbox.
+	 * 
+	 * @param name
+	 *            The name of the checkbox to add the listener to.
+	 * @param listener
+	 *            The listener to set.
+	 */
+	public void addCheckboxListener(String name, MUIInputHandler listener) {
+		_checkboxes.get(name).addListener(new MUIInputListener(listener));
+	}
+
+	/**
 	 * Removes a checkbox from the pane.
 	 * 
 	 * @param name
 	 *            The name of the checkbox to remove.
 	 */
 	public void removeCheckbox(String name) {
-		_checkboxes.get(name).remove();
-		_checkboxes.remove(name);
+		doLater(() -> {
+			_checkboxes.get(name).remove();
+			_checkboxes.remove(name);
+		});
 	}
+
+	/*
+	 * GROUPS
+	 */
 
 	/**
 	 * Creates an element group.
@@ -1194,9 +1426,11 @@ public class MUIPane extends Stage {
 	 *            The name of the group to create.
 	 */
 	public void createGroup(String name) {
-		Group group = new Group();
-		_groups.put(name, group);
-		addActor(group);
+		doLater(() -> {
+			Group group = new Group();
+			_groups.put(name, group);
+			addActor(group);
+		});
 	}
 
 	/**
@@ -1208,7 +1442,9 @@ public class MUIPane extends Stage {
 	 *            The new position to set.
 	 */
 	public void setGroupPos(String name, Vector2 pos) {
-		_groups.get(name).setPosition(pos.x, pos.y);
+		doLater(() -> {
+			_groups.get(name).setPosition(pos.x, pos.y);
+		});
 	}
 
 	/**
@@ -1222,7 +1458,9 @@ public class MUIPane extends Stage {
 	 *            The new Y position.
 	 */
 	public void setGroupPos(String name, float x, float y) {
-		_groups.get(name).setPosition(x, y);
+		doLater(() -> {
+			_groups.get(name).setPosition(x, y);
+		});
 	}
 
 	/**
@@ -1234,7 +1472,9 @@ public class MUIPane extends Stage {
 	 *            The new size of the group.
 	 */
 	public void setGroupSize(String name, Vector2 size) {
-		_groups.get(name).setSize(size.x, size.y);
+		doLater(() -> {
+			_groups.get(name).setSize(size.x, size.y);
+		});
 	}
 
 	/**
@@ -1247,7 +1487,52 @@ public class MUIPane extends Stage {
 	 *            The new height of the group.
 	 */
 	public void setGroupSize(String name, float w, float h) {
-		_groups.get(name).setSize(w, h);
+		doLater(() -> {
+			_groups.get(name).setSize(w, h);
+		});
+	}
+
+	/**
+	 * Sets whether a group processes input.
+	 * 
+	 * @param name
+	 *            The name of the group to modify.
+	 * @param active
+	 *            Whether or not the group should process input.
+	 */
+	public void setGroupActive(String name, boolean active) {
+		doLater(() -> {
+			_groups.get(name).setTouchable((active) ? Touchable.enabled : Touchable.disabled);
+		});
+	}
+
+	/**
+	 * Sets the visibility of a given group.
+	 * 
+	 * @param name
+	 *            The name of the group to modify.
+	 * @param visible
+	 *            Whether or not the given group is visible.
+	 */
+	public void setGroupVisible(String name, boolean visible) {
+		doLater(() -> {
+			_groups.get(name).setVisible(visible);
+		});
+	}
+
+	/**
+	 * Sets the opacity of a group.
+	 * 
+	 * @param group
+	 *            The name of the group to modify.
+	 * @param opacity
+	 *            The new opacity of the group.
+	 */
+	public void setGroupOpacity(String group, float opacity) {
+		doLater(() -> {
+			Color col = _groups.get(group).getColor();
+			_groups.get(group).setColor(new Color(col.r, col.g, col.b, opacity));
+		});
 	}
 
 	/**
@@ -1273,18 +1558,6 @@ public class MUIPane extends Stage {
 	}
 
 	/**
-	 * Sets the visibility of a given group.
-	 * 
-	 * @param name
-	 *            The name of the group to modify.
-	 * @param visible
-	 *            Whether or not the given group is visible.
-	 */
-	public void setGroupVisible(String name, boolean visible) {
-		_groups.get(name).setVisible(visible);
-	}
-
-	/**
 	 * Checks whether or not a group is visible.
 	 * 
 	 * @param name
@@ -1296,6 +1569,104 @@ public class MUIPane extends Stage {
 	}
 
 	/**
+	 * Gets the opacity of a group.
+	 * 
+	 * @param group
+	 *            The name of the group to poll.
+	 * @return The opacity of the given group.
+	 */
+	public float getGroupOpacity(String group) {
+		return _groups.get(group).getColor().a;
+	}
+
+	/**
+	 * Checks whether or not a group processes input.
+	 * 
+	 * @param name
+	 *            The name of the group to poll.
+	 * @return Whether or not the given group processes input.
+	 */
+	public boolean getGroupActive(String name) {
+		return _groups.get(name).isTouchable();
+	}
+
+	/**
+	 * Adds a custom actor to an element group.
+	 * 
+	 * @param group
+	 *            The name of the group to add the actor to.
+	 * @param element
+	 *            The element to be added.
+	 */
+	public void addElementToGroup(String group, Actor element) {
+		doLater(() -> {
+			_groups.get(group).addActor(element);
+		});
+	}
+
+	/**
+	 * Adds a supported element to an element group.
+	 * 
+	 * @param group
+	 *            The name of the group to add the object to.
+	 * @param type
+	 *            The type of the element to be added.
+	 * @param elementName
+	 *            The name of the element to be added.
+	 */
+	public void addElementToGroup(String group, ElementType type, String elementName) {
+		doLater(() -> {
+			switch (type) {
+			case BUTTON:
+				_buttons.get(elementName).remove();
+				_groups.get(group).addActor(_buttons.get(elementName));
+				break;
+			case CHECKBOX:
+				_checkboxes.get(elementName).remove();
+				_groups.get(group).addActor(_checkboxes.get(elementName));
+				break;
+			case LABEL:
+				_labels.get(elementName).remove();
+				_groups.get(group).addActor(_labels.get(elementName));
+				break;
+			case PBAR:
+				_pbars.get(elementName).remove();
+				_groups.get(group).addActor(_pbars.get(elementName));
+				break;
+			case SLIDER:
+				_sliders.get(elementName).remove();
+				_groups.get(group).addActor(_sliders.get(elementName));
+				break;
+			case IMAGE:
+				_images.get(elementName).remove();
+				_groups.get(group).addActor(_images.get(elementName));
+				break;
+			case GROUP:
+				break;
+			default:
+				break;
+			}
+		});
+	}
+
+	/**
+	 * Removes a group from the pane.
+	 * 
+	 * @param group
+	 *            The name of the group to remove.
+	 */
+	public void removeGroup(String group) {
+		doLater(() -> {
+			_groups.get(group).remove();
+			_groups.remove(group);
+		});
+	}
+
+	/*
+	 * IMAGES
+	 */
+
+	/**
 	 * Creates an image object.
 	 * 
 	 * @param name
@@ -1304,9 +1675,11 @@ public class MUIPane extends Stage {
 	 *            The image file to load.
 	 */
 	public void createImage(String name, String image) {
-		Image imageObj = new Image(new Texture(Gdx.files.internal("assets/ui/images/" + image)));
-		_images.put(name, imageObj);
-		this.addActor(imageObj);
+		doLater(() -> {
+			Image imageObj = new Image(new Texture(Gdx.files.internal("assets/ui/images/" + image)));
+			_images.put(name, imageObj);
+			this.addActor(imageObj);
+		});
 	}
 
 	/**
@@ -1318,7 +1691,9 @@ public class MUIPane extends Stage {
 	 *            Whether or not the image is visible.
 	 */
 	public void setImageVisible(String name, boolean visible) {
-		_images.get(name).setVisible(visible);
+		doLater(() -> {
+			_images.get(name).setVisible(visible);
+		});
 	}
 
 	/**
@@ -1330,7 +1705,9 @@ public class MUIPane extends Stage {
 	 *            The new position of the image.
 	 */
 	public void setImagePos(String name, Vector2 pos) {
-		_images.get(name).setPosition(pos.x, pos.y);
+		doLater(() -> {
+			_images.get(name).setPosition(pos.x, pos.y);
+		});
 	}
 
 	/**
@@ -1344,7 +1721,9 @@ public class MUIPane extends Stage {
 	 *            The new Y position of the image.
 	 */
 	public void setImagePos(String name, float x, float y) {
-		_images.get(name).setPosition(x, y);
+		doLater(() -> {
+			_images.get(name).setPosition(x, y);
+		});
 	}
 
 	/**
@@ -1356,7 +1735,9 @@ public class MUIPane extends Stage {
 	 *            The new size of the image.
 	 */
 	public void setImageSize(String name, Vector2 size) {
-		_images.get(name).setSize(size.x, size.y);
+		doLater(() -> {
+			_images.get(name).setSize(size.x, size.y);
+		});
 	}
 
 	/**
@@ -1370,7 +1751,9 @@ public class MUIPane extends Stage {
 	 *            The new height of the image.
 	 */
 	public void setImageSize(String name, float w, float h) {
-		_images.get(name).setSize(w, h);
+		doLater(() -> {
+			_images.get(name).setSize(w, h);
+		});
 	}
 
 	/**
@@ -1382,7 +1765,9 @@ public class MUIPane extends Stage {
 	 *            The new alpha to set.
 	 */
 	public void setImageOpacity(String name, float alpha) {
-		_images.get(name).setColor(new Color(1.0f, 1.0f, 1.0f, alpha));
+		doLater(() -> {
+			_images.get(name).setColor(new Color(1.0f, 1.0f, 1.0f, alpha));
+		});
 	}
 
 	/**
@@ -1436,110 +1821,10 @@ public class MUIPane extends Stage {
 	 *            The name of the image to remove.
 	 */
 	public void removeImage(String name) {
-		_images.get(name).remove();
-		_images.remove(name);
-	}
-
-	/**
-	 * Adds a supported element to an element group.
-	 * 
-	 * @param group
-	 *            The name of the group to add the object to.
-	 * @param type
-	 *            The type of the element to be added.
-	 * @param elementName
-	 *            The name of the element to be added.
-	 */
-	public void addElementToGroup(String group, ElementType type, String elementName) {
-		switch (type) {
-		case BUTTON:
-			_buttons.get(elementName).remove();
-			_groups.get(group).addActor(_buttons.get(elementName));
-			break;
-		case CHECKBOX:
-			_checkboxes.get(elementName).remove();
-			_groups.get(group).addActor(_checkboxes.get(elementName));
-			break;
-		case LABEL:
-			_labels.get(elementName).remove();
-			_groups.get(group).addActor(_labels.get(elementName));
-			break;
-		case PBAR:
-			_pbars.get(elementName).remove();
-			_groups.get(group).addActor(_pbars.get(elementName));
-			break;
-		case SLIDER:
-			_sliders.get(elementName).remove();
-			_groups.get(group).addActor(_sliders.get(elementName));
-			break;
-		case IMAGE:
-			_images.get(elementName).remove();
-			_groups.get(group).addActor(_images.get(elementName));
-			break;
-		case GROUP:
-			break;
-		default:
-			break;
-		}
-	}
-
-	/**
-	 * Adds a custom actor to an element group.
-	 * 
-	 * @param group
-	 *            The name of the group to add the actor to.
-	 * @param element
-	 *            The element to be added.
-	 */
-	public void addElementToGroup(String group, Actor element) {
-		_groups.get(group).addActor(element);
-	}
-
-	/**
-	 * Sets the opacity of a group.
-	 * 
-	 * @param group
-	 *            The name of the group to modify.
-	 * @param opacity
-	 *            The new opacity of the group.
-	 */
-	public void setGroupOpacity(String group, float opacity) {
-		Color col = _groups.get(group).getColor();
-		_groups.get(group).setColor(new Color(col.r, col.g, col.b, opacity));
-	}
-
-	/**
-	 * Removes a group from the pane.
-	 * 
-	 * @param group
-	 *            The name of the group to remove.
-	 */
-	public void removeGroup(String group) {
-		_groups.get(group).remove();
-		_groups.remove(group);
-	}
-
-	/**
-	 * Gets the opacity of a group.
-	 * 
-	 * @param group
-	 *            The name of the group to poll.
-	 * @return The opacity of the given group.
-	 */
-	public float getGroupOpacity(String group) {
-		return _groups.get(group).getColor().a;
-	}
-
-	/**
-	 * Adds a listener to checkbox.
-	 * 
-	 * @param name
-	 *            The name of the checkbox to add the listener to.
-	 * @param listener
-	 *            The listener to set.
-	 */
-	public void addCheckboxListener(String name, MUIInputHandler listener) {
-		_checkboxes.get(name).addListener(new MUIInputListener(listener));
+		doLater(() -> {
+			_images.get(name).remove();
+			_images.remove(name);
+		});
 	}
 
 	/**
@@ -1557,97 +1842,9 @@ public class MUIPane extends Stage {
 		return false;
 	}
 
-	/**
-	 * Sets whether a group processes input.
-	 * 
-	 * @param name
-	 *            The name of the group to modify.
-	 * @param active
-	 *            Whether or not the group should process input.
+	/*
+	 * REFERENCES
 	 */
-	public void setGroupActive(String name, boolean active) {
-		_groups.get(name).setTouchable((active) ? Touchable.enabled : Touchable.disabled);
-	}
-
-	/**
-	 * Sets whether a button processes input.
-	 * 
-	 * @param name
-	 *            The name of the button to modify.
-	 * @param active
-	 *            Whether or not the button should process input.
-	 */
-	public void setButtonActive(String name, boolean active) {
-		_buttons.get(name).setTouchable((active) ? Touchable.enabled : Touchable.disabled);
-	}
-
-	/**
-	 * Sets whether a slider processes input.
-	 * 
-	 * @param name
-	 *            The name of the slider to modify.
-	 * @param active
-	 *            Whether or not the slider should process input.
-	 */
-	public void setSliderActive(String name, boolean active) {
-		_sliders.get(name).setTouchable((active) ? Touchable.enabled : Touchable.disabled);
-	}
-
-	/**
-	 * Sets whether a checkbox processes input.
-	 * 
-	 * @param name
-	 *            The name of the checkbox to modify.
-	 * @param active
-	 *            Whether or not the checkbox should process input.
-	 */
-	public void setCheckboxActive(String name, boolean active) {
-		_checkboxes.get(name).setTouchable((active) ? Touchable.enabled : Touchable.disabled);
-	}
-
-	/**
-	 * Checks whether or not a group processes input.
-	 * 
-	 * @param name
-	 *            The name of the group to poll.
-	 * @return Whether or not the given group processes input.
-	 */
-	public boolean getGroupActive(String name) {
-		return _groups.get(name).isTouchable();
-	}
-
-	/**
-	 * Checks whether or not a button processes input.
-	 * 
-	 * @param name
-	 *            The name of the button to poll.
-	 * @return Whether or not the given button processes input.
-	 */
-	public boolean getButtonActive(String name) {
-		return _buttons.get(name).isTouchable();
-	}
-
-	/**
-	 * Checks whether or not a slider processes input.
-	 * 
-	 * @param name
-	 *            The name of the slider to poll.
-	 * @return Whether or not the given slider processes input.
-	 */
-	public boolean getSliderActive(String name) {
-		return _sliders.get(name).isTouchable();
-	}
-
-	/**
-	 * Checks whether or not a checkbox processes input.
-	 * 
-	 * @param name
-	 *            The name of the checkbox to poll.
-	 * @return Whether or not the given checkbox processes input.
-	 */
-	public boolean getCheckboxActive(String name) {
-		return _checkboxes.get(name).isTouchable();
-	}
 
 	/**
 	 * Gets a referenced to a given button.
@@ -1724,6 +1921,33 @@ public class MUIPane extends Stage {
 	 */
 	public MUIRef getImageRef(String name) {
 		return new MUIRef(name, this, ElementType.IMAGE);
+	}
+
+	/*
+	 * PANE METHODS
+	 */
+
+	/**
+	 * Pop and call a callback next update.
+	 * 
+	 * @param callback
+	 *            The callback to queue.
+	 */
+	public void doLater(MCallback callback) {
+		dlq.add(callback);
+	}
+
+	/**
+	 * Updates the pane.
+	 * 
+	 * @param delta
+	 *            The update's delta time.
+	 */
+	public void update(float delta) {
+		while (!dlq.isEmpty()) {
+			if (dlq.peek() != null)
+				dlq.pop().call();
+		}
 	}
 
 	@Override
