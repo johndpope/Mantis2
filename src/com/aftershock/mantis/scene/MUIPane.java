@@ -2,6 +2,7 @@ package com.aftershock.mantis.scene;
 
 import java.util.HashMap;
 
+import com.aftershock.mantis.scene.util.MUIRef;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -212,6 +213,16 @@ public class MUIPane extends Stage {
 	}
 
 	/**
+	 * Removes a label from the pane.
+	 * 
+	 * @param name
+	 *            The name of the label to remove.
+	 */
+	public void removeLabel(String name) {
+		_labels.get(name).remove();
+	}
+
+	/**
 	 * Gets the position of a label.
 	 * 
 	 * @param name
@@ -230,7 +241,7 @@ public class MUIPane extends Stage {
 	 * @param vis
 	 *            Whether or not to show the label.
 	 */
-	public void setLabelVisable(String name, boolean vis) {
+	public void setLabelVisible(String name, boolean vis) {
 		_labels.get(name).setVisible(vis);
 	}
 
@@ -265,7 +276,7 @@ public class MUIPane extends Stage {
 	 *            The name of the label to poll.
 	 * @return Whether or not the label is visible.
 	 */
-	public boolean isLabelVisable(String name) {
+	public boolean isLabelVisible(String name) {
 		return _labels.get(name).isVisible();
 	}
 
@@ -533,7 +544,7 @@ public class MUIPane extends Stage {
 	 * @param vis
 	 *            The new visibility of the button.
 	 */
-	public void setButtonVisable(String name, boolean vis) {
+	public void setButtonVisible(String name, boolean vis) {
 		_buttons.get(name).setVisible(vis);
 	}
 
@@ -544,7 +555,7 @@ public class MUIPane extends Stage {
 	 *            The name of the button to poll.
 	 * @return The visibility of the given button.
 	 */
-	public boolean isButtonVisable(String name) {
+	public boolean isButtonVisible(String name) {
 		return _buttons.get(name).isVisible();
 	}
 
@@ -628,7 +639,7 @@ public class MUIPane extends Stage {
 	 * @param val
 	 *            The value of the given progress bar.
 	 */
-	public void setProgressBarVal(String name, float val) {
+	public void setProgressBarValue(String name, float val) {
 		_pbars.get(name).setValue(val);
 	}
 
@@ -700,7 +711,7 @@ public class MUIPane extends Stage {
 	 *            The name of the progress bar to poll.
 	 * @return The value of the given progress bar.
 	 */
-	public float getProgressBarVal(String name) {
+	public float getProgressBarValue(String name) {
 		return _pbars.get(name).getValue();
 	}
 
@@ -745,7 +756,7 @@ public class MUIPane extends Stage {
 	 * @param vis
 	 *            The visibility to set.
 	 */
-	public void setProgressBarVisable(String name, boolean vis) {
+	public void setProgressBarVisible(String name, boolean vis) {
 		_pbars.get(name).setVisible(vis);
 	}
 
@@ -756,7 +767,7 @@ public class MUIPane extends Stage {
 	 *            The name of the progress bar to poll.
 	 * @return Whether or not the progress bar is visible.
 	 */
-	public boolean isProgressBarVisable(String name) {
+	public boolean isProgressBarVisible(String name) {
 		return _pbars.get(name).isVisible();
 	}
 
@@ -838,7 +849,7 @@ public class MUIPane extends Stage {
 	 * @param val
 	 *            The value to set.
 	 */
-	public void setSliderVal(String name, float val) {
+	public void setSliderValue(String name, float val) {
 		_sliders.get(name).setValue(val);
 	}
 
@@ -901,7 +912,7 @@ public class MUIPane extends Stage {
 	 *            Name of the slider to poll.
 	 * @return The value of the given slider.
 	 */
-	public float getSliderVal(String name) {
+	public float getSliderValue(String name) {
 		return _sliders.get(name).getValue();
 	}
 
@@ -946,7 +957,7 @@ public class MUIPane extends Stage {
 	 * @param vis
 	 *            The visibility to set.
 	 */
-	public void setSliderVisable(String name, boolean vis) {
+	public void setSliderVisible(String name, boolean vis) {
 		_sliders.get(name).setVisible(vis);
 	}
 
@@ -957,7 +968,7 @@ public class MUIPane extends Stage {
 	 *            The name of the slider to poll.
 	 * @return The visibility of the given slider.
 	 */
-	public boolean isSliderVisable(String name) {
+	public boolean isSliderVisible(String name) {
 		return _sliders.get(name).isVisible();
 	}
 
@@ -1110,18 +1121,6 @@ public class MUIPane extends Stage {
 	}
 
 	/**
-	 * Set whether or not a checkbox is checked.
-	 * 
-	 * @param name
-	 *            The name of the checkbox to set.
-	 * @param checked
-	 *            Whether or not the checkbox is checked.
-	 */
-	public void setChecked(String name, boolean checked) {
-		_checkboxes.get(name).setChecked(checked);
-	}
-
-	/**
 	 * Gets the position of a checkbox.
 	 * 
 	 * @param name
@@ -1162,7 +1161,7 @@ public class MUIPane extends Stage {
 	 * @param vis
 	 *            The visibility to set.
 	 */
-	public void setCheckboxVisable(String name, boolean vis) {
+	public void setCheckboxVisible(String name, boolean vis) {
 		_checkboxes.get(name).setVisible(vis);
 	}
 
@@ -1173,7 +1172,7 @@ public class MUIPane extends Stage {
 	 *            The name of the checkbox to poll.
 	 * @return Whether or not the checkbox is visible.
 	 */
-	public boolean isCheckboxVisable(String name) {
+	public boolean isCheckboxVisible(String name) {
 		return _checkboxes.get(name).isVisible();
 	}
 
@@ -1274,6 +1273,29 @@ public class MUIPane extends Stage {
 	}
 
 	/**
+	 * Sets the visibility of a given group.
+	 * 
+	 * @param name
+	 *            The name of the group to modify.
+	 * @param visible
+	 *            Whether or not the given group is visible.
+	 */
+	public void setGroupVisible(String name, boolean visible) {
+		_groups.get(name).setVisible(visible);
+	}
+
+	/**
+	 * Checks whether or not a group is visible.
+	 * 
+	 * @param name
+	 *            The name of the group to poll.
+	 * @return Whether or not the given group is visible.
+	 */
+	public boolean isGroupVisible(String name) {
+		return _groups.get(name).isVisible();
+	}
+
+	/**
 	 * Creates an image object.
 	 * 
 	 * @param name
@@ -1285,6 +1307,18 @@ public class MUIPane extends Stage {
 		Image imageObj = new Image(new Texture(Gdx.files.internal("assets/ui/images/" + image)));
 		_images.put(name, imageObj);
 		this.addActor(imageObj);
+	}
+
+	/**
+	 * Sets an image's visibility.
+	 * 
+	 * @param name
+	 *            The name of the image to modify.
+	 * @param visible
+	 *            Whether or not the image is visible.
+	 */
+	public void setImageVisible(String name, boolean visible) {
+		_images.get(name).setVisible(visible);
 	}
 
 	/**
@@ -1360,6 +1394,17 @@ public class MUIPane extends Stage {
 	 */
 	public float getImageOpacity(String name) {
 		return _images.get(name).getColor().a;
+	}
+
+	/**
+	 * Checks whether or not an image is visible.
+	 * 
+	 * @param name
+	 *            The name of the image to poll.
+	 * @return Whether or not the given image is visible.
+	 */
+	public boolean isImageVisible(String name) {
+		return _images.get(name).isVisible();
 	}
 
 	/**
@@ -1464,6 +1509,17 @@ public class MUIPane extends Stage {
 	}
 
 	/**
+	 * Removes a group from the pane.
+	 * 
+	 * @param group
+	 *            The name of the group to remove.
+	 */
+	public void removeGroup(String group) {
+		_groups.get(group).remove();
+		_groups.remove(group);
+	}
+
+	/**
 	 * Gets the opacity of a group.
 	 * 
 	 * @param group
@@ -1489,14 +1545,14 @@ public class MUIPane extends Stage {
 	/**
 	 * Checks whether an element exists.
 	 * 
-	 * @param object
+	 * @param element
 	 *            The name of the element to query.
 	 * @return Whether or not the element exists in the pane.
 	 */
-	public boolean doesUIElementExist(String object) {
-		if (_labels.containsKey(object) || _buttons.containsKey(object) || _pbars.containsKey(object)
-				|| _sliders.containsKey(object) || _checkboxes.containsKey(object) || _images.containsKey(object)
-				|| _groups.containsKey(object))
+	public boolean doesUIElementExist(String element) {
+		if (_labels.containsKey(element) || _buttons.containsKey(element) || _pbars.containsKey(element)
+				|| _sliders.containsKey(element) || _checkboxes.containsKey(element) || _images.containsKey(element)
+				|| _groups.containsKey(element))
 			return true;
 		return false;
 	}
@@ -1591,6 +1647,83 @@ public class MUIPane extends Stage {
 	 */
 	public boolean getCheckboxActive(String name) {
 		return _checkboxes.get(name).isTouchable();
+	}
+
+	/**
+	 * Gets a referenced to a given button.
+	 * 
+	 * @param name
+	 *            The name of the button to reference.
+	 * @return A new reference to the given button.
+	 */
+	public MUIRef getButtonRef(String name) {
+		return new MUIRef(name, this, ElementType.BUTTON);
+	}
+
+	/**
+	 * Gets a referenced to a given label.
+	 * 
+	 * @param name
+	 *            The name of the label to reference.
+	 * @return A new reference to the given label.
+	 */
+	public MUIRef getLabelRef(String name) {
+		return new MUIRef(name, this, ElementType.LABEL);
+	}
+
+	/**
+	 * Gets a referenced to a given progress bar.
+	 * 
+	 * @param name
+	 *            The name of the progress bar to reference.
+	 * @return A new reference to the given progress bar.
+	 */
+	public MUIRef getProgressBarRef(String name) {
+		return new MUIRef(name, this, ElementType.PBAR);
+	}
+
+	/**
+	 * Gets a referenced to a given slider.
+	 * 
+	 * @param name
+	 *            The name of the slider to reference.
+	 * @return A new reference to the given slider.
+	 */
+	public MUIRef getSliderRef(String name) {
+		return new MUIRef(name, this, ElementType.SLIDER);
+	}
+
+	/**
+	 * Gets a referenced to a given checkbox.
+	 * 
+	 * @param name
+	 *            The name of the checkbox to reference.
+	 * @return A new reference to the given checkbox.
+	 */
+	public MUIRef getCheckboxRef(String name) {
+		return new MUIRef(name, this, ElementType.CHECKBOX);
+	}
+
+	/**
+	 * Gets a referenced to a given group.
+	 * 
+	 * @param name
+	 *            The name of the group to reference.
+	 * @return A new reference to the given group.
+	 */
+	public MUIRef getGroupRef(String name) {
+		return new MUIRef(name, this, ElementType.GROUP);
+	}
+
+	/**
+	 * Gets a referenced to a given image.
+	 * 
+	 * @param name
+	 *            The name of the image to reference.
+	 * @return A new reference to the given image.
+	 */
+	public MUIRef getImageRef(String name) {
+		return new MUIRef(name, this, ElementType.IMAGE);
 	}
 
 	@Override

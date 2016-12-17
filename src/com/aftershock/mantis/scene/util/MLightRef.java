@@ -136,4 +136,13 @@ public class MLightRef {
 		return _owningScene.getLightConeAngle(_name);
 	}
 
+	/**
+	 * Checks whether or not the referenced light is visible.
+	 * 
+	 * @return Whether or not the referenced light is visible.
+	 */
+	public boolean doesExist() {
+		return _owningScene.doesLightExist(_name);
+	}
+
 }
