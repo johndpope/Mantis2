@@ -14,7 +14,8 @@ import com.badlogic.gdx.physics.box2d.Body;
 /**
  * Light which source is at infinite distance
  * 
- * <p>Extends {@link Light}
+ * <p>
+ * Extends {@link Light}
  * 
  * @author kalle_h
  */
@@ -26,10 +27,11 @@ public class DirectionalLight extends Light {
 	protected float cos;
 
 	/**
-	 * Creates directional light which source is at infinite distance,
-	 * direction and intensity is same everywhere
+	 * Creates directional light which source is at infinite distance, direction
+	 * and intensity is same everywhere
 	 * 
-	 * <p>-90 direction is straight from up
+	 * <p>
+	 * -90 direction is straight from up
 	 * 
 	 * @param rayHandler
 	 *            not {@code null} instance of RayHandler
@@ -41,11 +43,10 @@ public class DirectionalLight extends Light {
 	 * @param directionDegree
 	 *            direction in degrees
 	 */
-	public DirectionalLight(RayHandler rayHandler, int rays, Color color,
-			float directionDegree) {
-		
+	public DirectionalLight(RayHandler rayHandler, int rays, Color color, float directionDegree) {
+
 		super(rayHandler, rays, color, Float.POSITIVE_INFINITY, directionDegree);
-		
+
 		vertexNum = (vertexNum - 1) * 2;
 		start = new Vector2[rayNum];
 		end = new Vector2[rayNum];
@@ -53,32 +54,30 @@ public class DirectionalLight extends Light {
 			start[i] = new Vector2();
 			end[i] = new Vector2();
 		}
-		
-		lightMesh = new Mesh(
-				VertexDataType.VertexArray, staticLight, vertexNum, 0,
+
+		lightMesh = new Mesh(VertexDataType.VertexArray, staticLight, vertexNum, 0,
 				new VertexAttribute(Usage.Position, 2, "vertex_positions"),
-				new VertexAttribute(Usage.ColorPacked, 4, "quad_colors"),
-				new VertexAttribute(Usage.Generic, 1, "s"));
-		softShadowMesh = new Mesh(
-				VertexDataType.VertexArray, staticLight, vertexNum, 0,
+				new VertexAttribute(Usage.ColorPacked, 4, "quad_colors"), new VertexAttribute(Usage.Generic, 1, "s"));
+		softShadowMesh = new Mesh(VertexDataType.VertexArray, staticLight, vertexNum, 0,
 				new VertexAttribute(Usage.Position, 2, "vertex_positions"),
-				new VertexAttribute(Usage.ColorPacked, 4, "quad_colors"),
-				new VertexAttribute(Usage.Generic, 1, "s"));
-		
+				new VertexAttribute(Usage.ColorPacked, 4, "quad_colors"), new VertexAttribute(Usage.Generic, 1, "s"));
+
 		update();
 	}
 
 	@Override
-	public void setDirection (float direction) {
+	public void setDirection(float direction) {
 		this.direction = direction;
 		sin = MathUtils.sinDeg(direction);
 		cos = MathUtils.cosDeg(direction);
-		if (staticLight) dirty = true;
+		if (staticLight)
+			dirty = true;
 	}
-	
+
 	@Override
-	void update () {
-		if (staticLight && !dirty) return;
+	void update() {
+		if (staticLight && !dirty)
+			return;
 		dirty = false;
 
 		final float width = (rayHandler.x2 - rayHandler.x1);
@@ -93,7 +92,7 @@ public class DirectionalLight extends Light {
 			xAxelOffSet = 1;
 			yAxelOffSet = 1;
 		}
-		
+
 		final float widthOffSet = sizeOfScreen * -sin;
 		final float heightOffSet = sizeOfScreen * cos;
 
@@ -136,7 +135,8 @@ public class DirectionalLight extends Light {
 		}
 		lightMesh.setVertices(segments, 0, size);
 
-		if (!soft || xray) return;
+		if (!soft || xray)
+			return;
 
 		size = 0;
 		for (int i = 0; i < arraySize; i++) {
@@ -154,19 +154,17 @@ public class DirectionalLight extends Light {
 	}
 
 	@Override
-	void render () {
+	void render() {
 		rayHandler.lightRenderedLastFrame++;
-		lightMesh.render(
-				rayHandler.lightShader, GL20.GL_TRIANGLE_STRIP, 0, vertexNum);
-		
+		lightMesh.render(rayHandler.lightShader, GL20.GL_TRIANGLE_STRIP, 0, vertexNum);
+
 		if (soft && !xray) {
-			softShadowMesh.render(
-				rayHandler.lightShader, GL20.GL_TRIANGLE_STRIP, 0, vertexNum);
+			softShadowMesh.render(rayHandler.lightShader, GL20.GL_TRIANGLE_STRIP, 0, vertexNum);
 		}
 	}
-	
+
 	@Override
-	public boolean contains (float x, float y) {
+	public boolean contains(float x, float y) {
 		boolean oddNodes = false;
 		float x2 = mx[rayNum] = start[0].x;
 		float y2 = my[rayNum] = start[0].y;
@@ -175,14 +173,16 @@ public class DirectionalLight extends Light {
 			x1 = mx[i];
 			y1 = my[i];
 			if (((y1 < y) && (y2 >= y)) || (y1 >= y) && (y2 < y)) {
-				if ((y - y1) / (y2 - y1) * (x2 - x1) < (x - x1)) oddNodes = !oddNodes;
+				if ((y - y1) / (y2 - y1) * (x2 - x1) < (x - x1))
+					oddNodes = !oddNodes;
 			}
 		}
 		for (int i = 0; i < rayNum; x2 = x1, y2 = y1, ++i) {
 			x1 = start[i].x;
 			y1 = start[i].y;
 			if (((y1 < y) && (y2 >= y)) || (y1 >= y) && (y2 < y)) {
-				if ((y - y1) / (y2 - y1) * (x2 - x1) < (x - x1)) oddNodes = !oddNodes;
+				if ((y - y1) / (y2 - y1) * (x2 - x1) < (x - x1))
+					oddNodes = !oddNodes;
 			}
 		}
 		return oddNodes;
@@ -191,46 +191,52 @@ public class DirectionalLight extends Light {
 	/** Not applicable for this light type **/
 	@Deprecated
 	@Override
-	public void attachToBody (Body body) {
+	public void attachToBody(Body body) {
 	}
-	
+
 	/** Not applicable for this light type **/
 	@Deprecated
 	@Override
-	public void setPosition (float x, float y) {
+	public void setPosition(float x, float y) {
 	}
 
-	/** Not applicable for this light type
-	 * <p>Always return {@code null}
+	/**
+	 * Not applicable for this light type
+	 * <p>
+	 * Always return {@code null}
 	 **/
 	@Deprecated
 	@Override
-	public Body getBody () {
+	public Body getBody() {
 		return null;
 	}
 
-	/** Not applicable for this light type
-	 * <p>Always return {@code 0}
+	/**
+	 * Not applicable for this light type
+	 * <p>
+	 * Always return {@code 0}
 	 **/
 	@Deprecated
 	@Override
-	public float getX () {
+	public float getX() {
 		return 0;
 	}
 
-	/** Not applicable for this light type
-	 * <p>Always return {@code 0}
+	/**
+	 * Not applicable for this light type
+	 * <p>
+	 * Always return {@code 0}
 	 **/
 	@Deprecated
 	@Override
-	public float getY () {
+	public float getY() {
 		return 0;
 	}
 
 	/** Not applicable for this light type **/
 	@Deprecated
 	@Override
-	public void setPosition (Vector2 position) {
+	public void setPosition(Vector2 position) {
 	}
 
 	/** Not applicable for this light type **/
@@ -238,21 +244,22 @@ public class DirectionalLight extends Light {
 	@Override
 	public void setDistance(float dist) {
 	}
-	
+
 	/** Not applicable for this light type **/
 	@Deprecated
 	@Override
 	public void setIgnoreAttachedBody(boolean flag) {
 	}
-	
-	/** Not applicable for this light type
-	 * <p>Always return {@code false}
+
+	/**
+	 * Not applicable for this light type
+	 * <p>
+	 * Always return {@code false}
 	 **/
 	@Deprecated
 	@Override
 	public boolean getIgnoreAttachedBody() {
 		return false;
 	}
-
 
 }

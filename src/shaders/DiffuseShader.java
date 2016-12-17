@@ -18,21 +18,15 @@ public class DiffuseShader {
 		// this is allways perfect precision
 		final String fragmentShader = "#ifdef GL_ES\n" //
 				+ "precision lowp float;\n" //
-				+ "#define MED mediump\n"				
-				+ "#else\n"				
-				+ "#define MED \n"
-				+ "#endif\n" //
+				+ "#define MED mediump\n" + "#else\n" + "#define MED \n" + "#endif\n" //
 				+ "varying MED vec2 v_texCoords;\n" //
 				+ "uniform sampler2D u_texture;\n" //
-				+ "uniform  vec4 ambient;\n"
-					+ "void main()\n"//
+				+ "uniform  vec4 ambient;\n" + "void main()\n"//
 				+ "{\n" //
 				+ "gl_FragColor.rgb = (ambient.rgb + texture2D(u_texture, v_texCoords).rgb);\n"
-				+ "gl_FragColor.a = 1.0;\n"
-					+ "}\n";
+				+ "gl_FragColor.a = 1.0;\n" + "}\n";
 		ShaderProgram.pedantic = false;
-		ShaderProgram shadowShader = new ShaderProgram(vertexShader,
-					fragmentShader);
+		ShaderProgram shadowShader = new ShaderProgram(vertexShader, fragmentShader);
 		if (shadowShader.isCompiled() == false) {
 			Gdx.app.log("ERROR", shadowShader.getLog());
 

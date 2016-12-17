@@ -52,16 +52,15 @@ class LightMap {
 			} else {
 				shader.begin();
 				rayHandler.shadowBlendFunc.apply();
-				shader.setUniformf("ambient", c.r * c.a, c.g * c.a,
-						c.b * c.a, 1f - c.a);
+				shader.setUniformf("ambient", c.r * c.a, c.g * c.a, c.b * c.a, 1f - c.a);
 			}
-		//	shader.setUniformi("u_texture", 0);
+			// shader.setUniformi("u_texture", 0);
 			lightMapMesh.render(shader, GL20.GL_TRIANGLE_FAN);
 			shader.end();
 		} else if (needed) {
 			rayHandler.simpleBlendFunc.apply();
 			withoutShadowShader.begin();
-		//	withoutShadowShader.setUniformi("u_texture", 0);
+			// withoutShadowShader.setUniformi("u_texture", 0);
 			lightMapMesh.render(withoutShadowShader, GL20.GL_TRIANGLE_FAN);
 			withoutShadowShader.end();
 		}
@@ -78,7 +77,7 @@ class LightMap {
 			pingPongBuffer.begin();
 			{
 				blurShader.begin();
-		//		blurShader.setUniformi("u_texture", 0);
+				// blurShader.setUniformi("u_texture", 0);
 				blurShader.setUniformf("dir", 1f, 0f);
 				lightMapMesh.render(blurShader, GL20.GL_TRIANGLE_FAN, 0, 4);
 				blurShader.end();
@@ -90,18 +89,15 @@ class LightMap {
 			frameBuffer.begin();
 			{
 				blurShader.begin();
-			//	blurShader.setUniformi("u_texture", 0);
+				// blurShader.setUniformi("u_texture", 0);
 				blurShader.setUniformf("dir", 0f, 1f);
 				lightMapMesh.render(blurShader, GL20.GL_TRIANGLE_FAN, 0, 4);
 				blurShader.end();
 
 			}
 			if (rayHandler.customViewport) {
-				frameBuffer.end(
-					rayHandler.viewportX,
-					rayHandler.viewportY,
-					rayHandler.viewportWidth,
-					rayHandler.viewportHeight);
+				frameBuffer.end(rayHandler.viewportX, rayHandler.viewportY, rayHandler.viewportWidth,
+						rayHandler.viewportHeight);
 			} else {
 				frameBuffer.end();
 			}
@@ -117,10 +113,8 @@ class LightMap {
 			fboWidth = 1;
 		if (fboHeight <= 0)
 			fboHeight = 1;
-		frameBuffer = new FrameBuffer(Format.RGBA8888, fboWidth,
-				fboHeight, false);
-		pingPongBuffer = new FrameBuffer(Format.RGBA8888, fboWidth,
-				fboHeight, false);
+		frameBuffer = new FrameBuffer(Format.RGBA8888, fboWidth, fboHeight, false);
+		pingPongBuffer = new FrameBuffer(Format.RGBA8888, fboWidth, fboHeight, false);
 
 		lightMapMesh = createLightMapMesh();
 
@@ -170,9 +164,8 @@ class LightMap {
 		verts[U4] = 0f;
 		verts[V4] = 1f;
 
-		Mesh tmpMesh = new Mesh(true, 4, 0, new VertexAttribute(
-				Usage.Position, 2, "a_position"), new VertexAttribute(
-				Usage.TextureCoordinates, 2, "a_texCoord"));
+		Mesh tmpMesh = new Mesh(true, 4, 0, new VertexAttribute(Usage.Position, 2, "a_position"),
+				new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord"));
 
 		tmpMesh.setVertices(verts);
 		return tmpMesh;

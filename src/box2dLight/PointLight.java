@@ -6,7 +6,8 @@ import com.badlogic.gdx.math.MathUtils;
 /**
  * Light shaped as a circle with given radius
  * 
- * <p>Extends {@link PositionalLight}
+ * <p>
+ * Extends {@link PositionalLight}
  * 
  * @author kalle_h
  */
@@ -25,7 +26,7 @@ public class PointLight extends PositionalLight {
 	public PointLight(RayHandler rayHandler, int rays) {
 		this(rayHandler, rays, Light.DefaultColor, 15f, 0f, 0f);
 	}
-	
+
 	/**
 	 * Creates light shaped as a circle with given radius
 	 * 
@@ -43,28 +44,32 @@ public class PointLight extends PositionalLight {
 	 * @param y
 	 *            vertical position in world coordinates
 	 */
-	public PointLight(RayHandler rayHandler, int rays, Color color,
-			float distance, float x, float y) {
+	public PointLight(RayHandler rayHandler, int rays, Color color, float distance, float x, float y) {
 		super(rayHandler, rays, color, distance, x, y, 0f);
 	}
-	
+
 	@Override
-	public void update () {
+	public void update() {
 		updateBody();
-		if (dirty) setEndPoints();
-		
-		if (cull()) return;
-		if (staticLight && !dirty) return;
-		
+		if (dirty)
+			setEndPoints();
+
+		if (cull())
+			return;
+		if (staticLight && !dirty)
+			return;
+
 		dirty = false;
 		updateMesh();
 	}
-	
+
 	/**
 	 * Sets light distance
 	 * 
-	 * <p>MIN value capped to 0.1f meter
-	 * <p>Actual recalculations will be done only on {@link #update()} call
+	 * <p>
+	 * MIN value capped to 0.1f meter
+	 * <p>
+	 * Actual recalculations will be done only on {@link #update()} call
 	 */
 	@Override
 	public void setDistance(float dist) {
@@ -72,7 +77,7 @@ public class PointLight extends PositionalLight {
 		this.distance = dist < 0.01f ? 0.01f : dist;
 		dirty = true;
 	}
-	
+
 	/** Updates light basing on it's distance and rayNum **/
 	void setEndPoints() {
 		float angleNum = 360f / (rayNum - 1);
@@ -84,7 +89,7 @@ public class PointLight extends PositionalLight {
 			endY[i] = distance * sin[i];
 		}
 	}
-	
+
 	/** Not applicable for this light type **/
 	@Deprecated
 	@Override
