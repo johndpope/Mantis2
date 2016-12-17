@@ -208,14 +208,64 @@ public class MScene2D extends Stage {
 	 *            Pitch offset to apply to the sound.
 	 * @param pan
 	 *            Panning offset of the sound.
+	 * @param loop
+	 *            Whether or not to loop the sound.
 	 */
-	public void playSound(String name, float vol, float pitch, float pan) {
-		if (_sounds.get(name) != null)
-			_sounds.get(name).play(vol * _volume, pitch * _pitch, pan * _pan);
+	public long playSound(String name, float vol, float pitch, float pan, boolean loop) {
+		if (_sounds.get(name) != null) {
+			long id = _sounds.get(name).play(vol * _volume, pitch * _pitch, pan * _pan);
+			_sounds.get(name).setLooping(id, loop);
+			return id;
+		}
+		return 0;
 	}
 
 	/**
-	 * Stop started sound before completion.
+	 * Sets the volume of a playing sound.
+	 * 
+	 * @param name
+	 *            The name of the sound to modify.
+	 * @param id
+	 *            The ID of the sound instance.
+	 * @param vol
+	 *            The new volume.
+	 */
+	public void setSoundVol(String name, long id, float vol) {
+		_sounds.get(name).setVolume(id, vol);
+	}
+
+	/**
+	 * Sets the pitch of a playing sound.
+	 * 
+	 * @param name
+	 *            The name of the sound to modify.
+	 * @param id
+	 *            The ID of the sound instance.
+	 * @param pitch
+	 *            The new pitch.
+	 */
+	public void setSoundPitch(String name, long id, float pitch) {
+		_sounds.get(name).setPitch(id, pitch);
+	}
+
+	/**
+	 * Sets the pan of a playing sound/
+	 * 
+	 * @param name
+	 *            The name of the sound to modify.
+	 * @param id
+	 *            The ID of the sound instance.
+	 * @param pan
+	 *            The new pan.
+	 * @param volume
+	 *            The new volume.
+	 */
+	public void setSoundPan(String name, long id, float pan, float volume) {
+		_sounds.get(name).setPan(id, pan, volume);
+	}
+
+	/**
+	 * Stop all instances of this sound.
 	 * 
 	 * @param name
 	 *            The name of the sound to be stopped.
@@ -223,6 +273,18 @@ public class MScene2D extends Stage {
 	public void stopSound(String name) {
 		if (_sounds.get(name) != null)
 			_sounds.get(name).stop();
+	}
+
+	/**
+	 * Stops a specific sound instance.
+	 * 
+	 * @param name
+	 *            The name of the sound to stop.
+	 * @param id
+	 *            The instance ID of the sound to stop.
+	 */
+	public void stopSound(String name, long id) {
+		_sounds.get(name).stop(id);
 	}
 
 	/**
