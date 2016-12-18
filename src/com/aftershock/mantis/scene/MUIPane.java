@@ -1,7 +1,12 @@
 package com.aftershock.mantis.scene;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+
+import org.w3c.css.sac.InputSource;
+import org.w3c.dom.css.CSSStyleRule;
+import org.w3c.dom.css.CSSStyleSheet;
 
 import com.aftershock.mantis.MCallback;
 import com.aftershock.mantis.scene.util.MUIRef;
@@ -29,6 +34,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.steadystate.css.parser.CSSOMParser;
 
 /*
  * Copyright 2016 Luke Diamond
@@ -1935,6 +1941,268 @@ public class MUIPane extends Stage {
 	 */
 	public void doLater(MCallback callback) {
 		dlq.add(callback);
+	}
+
+	public void useCSS(String file) {
+		CSSOMParser parser = new CSSOMParser();
+		CSSStyleSheet sheet;
+		try {
+			sheet = parser.parseStyleSheet(new InputSource(Gdx.files.internal("assets/ui/styles/" + file).reader()),
+					null, null);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+
+		for (int i = 0; i < sheet.getCssRules().getLength(); i++) {
+			CSSStyleRule rule = (CSSStyleRule) sheet.getCssRules().item(i);
+			String rrule = rule.getSelectorText();
+			for (int n = 0; n < rule.getStyle().getLength(); n++) {
+				String rkey = rule.getStyle().item(n);
+				String rval = rule.getStyle().getPropertyValue(rkey);
+				_applyStyle(rrule, rkey, rval);
+			}
+		}
+	}
+
+	public float _evaluateNum(String num, boolean vh) {
+		if (num.endsWith("%")) {
+			if (vh) {
+				return (Float.parseFloat(num.replaceAll("%", "")) / 100.0f) * this.getHeight();
+			} else {
+				return (Float.parseFloat(num.replaceAll("%", "")) / 100.0f) * this.getWidth();
+			}
+		} else if (num.endsWith("px")) {
+			return Float.parseFloat(num.substring(0, num.indexOf("px")));
+		} else {
+			return Float.parseFloat(num);
+		}
+	}
+
+	public void _setWidth(String element, String type, String w) {
+		switch (type.toLowerCase()) {
+		case "button":
+			setButtonSize(element, new Vector2(_evaluateNum(w, false), getButtonSize(element).y));
+			break;
+		case "slider":
+			setSliderSize(element, new Vector2(_evaluateNum(w, false), getSliderSize(element).y));
+			break;
+		case "progressbar":
+			setProgressBarSize(element, new Vector2(_evaluateNum(w, false), getProgressBarSize(element).y));
+			break;
+		case "label":
+			setLabelSize(element, new Vector2(_evaluateNum(w, false), getLabelSize(element).y));
+			break;
+		case "checkbox":
+			setCheckboxSize(element, new Vector2(_evaluateNum(w, false), getCheckboxSize(element).y));
+			break;
+		case "group":
+			setGroupSize(element, new Vector2(_evaluateNum(w, false), getGroupSize(element).y));
+			break;
+		case "image":
+			setImageSize(element, new Vector2(_evaluateNum(w, false), getImageSize(element).y));
+			break;
+		}
+		update(0.0f);
+	}
+
+	public void _setHeight(String element, String type, String h) {
+		switch (type.toLowerCase()) {
+		case "button":
+			setButtonSize(element, new Vector2(getButtonSize(element).x, _evaluateNum(h, true)));
+			break;
+		case "slider":
+			setSliderSize(element, new Vector2(getSliderSize(element).x, _evaluateNum(h, true)));
+			break;
+		case "progressbar":
+			setProgressBarSize(element, new Vector2(getProgressBarSize(element).x, _evaluateNum(h, true)));
+			break;
+		case "label":
+			setLabelSize(element, new Vector2(getLabelSize(element).x, _evaluateNum(h, true)));
+			break;
+		case "checkbox":
+			setCheckboxSize(element, new Vector2(getCheckboxSize(element).x, _evaluateNum(h, true)));
+			break;
+		case "group":
+			setGroupSize(element, new Vector2(getGroupSize(element).x, _evaluateNum(h, true)));
+			break;
+		case "image":
+			setImageSize(element, new Vector2(getImageSize(element).x, _evaluateNum(h, true)));
+			break;
+		}
+		update(0.0f);
+	}
+
+	public void _setOpacity(String element, String type, String op) {
+		switch (type.toLowerCase()) {
+		case "button":
+			setButtonOpacity(element, Float.parseFloat(op));
+			break;
+		case "slider":
+			setSliderOpacity(element, Float.parseFloat(op));
+			break;
+		case "progressbar":
+			setProgressBarOpacity(element, Float.parseFloat(op));
+			break;
+		case "label":
+			setLabelOpacity(element, Float.parseFloat(op));
+			break;
+		case "checkbox":
+			setCheckboxOpacity(element, Float.parseFloat(op));
+			break;
+		case "group":
+			setGroupOpacity(element, Float.parseFloat(op));
+			break;
+		case "image":
+			setImageOpacity(element, Float.parseFloat(op));
+			break;
+		}
+		update(0.0f);
+	}
+
+	public void _setLeft(String element, String type, String left) {
+		float leftPos = _evaluateNum(left, false);
+
+		switch (type.toLowerCase()) {
+		case "button":
+			setButtonPos(element, leftPos, getButtonPos(element).y);
+			break;
+		case "slider":
+			setSliderPos(element, leftPos, getSliderPos(element).y);
+			break;
+		case "progressbar":
+			setProgressBarPos(element, leftPos, getProgressBarPos(element).y);
+			break;
+		case "label":
+			setLabelPos(element, leftPos, getLabelPos(element).y);
+			break;
+		case "checkbox":
+			setCheckboxPos(element, leftPos, getCheckboxPos(element).y);
+			break;
+		case "group":
+			setGroupPos(element, leftPos, getGroupPos(element).y);
+			break;
+		case "image":
+			setImagePos(element, leftPos, getImagePos(element).y);
+			break;
+		}
+		update(0.0f);
+	}
+
+	public void _setRight(String element, String type, String right) {
+		float rightPos = this.getWidth() - _evaluateNum(right, false);
+
+		switch (type.toLowerCase()) {
+		case "button":
+			setButtonPos(element, rightPos, getButtonPos(element).y);
+			break;
+		case "slider":
+			setSliderPos(element, rightPos, getSliderPos(element).y);
+			break;
+		case "progressbar":
+			setProgressBarPos(element, rightPos, getProgressBarPos(element).y);
+			break;
+		case "label":
+			setLabelPos(element, rightPos, getLabelPos(element).y);
+			break;
+		case "checkbox":
+			setCheckboxPos(element, rightPos, getCheckboxPos(element).y);
+			break;
+		case "group":
+			setGroupPos(element, rightPos, getGroupPos(element).y);
+			break;
+		case "image":
+			setImagePos(element, rightPos, getImagePos(element).y);
+			break;
+		}
+		update(0.0f);
+	}
+
+	public void _setTop(String element, String type, String top) {
+		float topPos = this.getHeight() - _evaluateNum(top, true);
+
+		switch (type.toLowerCase()) {
+		case "button":
+			setButtonPos(element, getButtonPos(element).x, topPos);
+			break;
+		case "slider":
+			setSliderPos(element, getSliderPos(element).x, topPos);
+			break;
+		case "progressbar":
+			setProgressBarPos(element, getProgressBarPos(element).x, topPos);
+			break;
+		case "label":
+			setLabelPos(element, getLabelPos(element).x, topPos);
+			break;
+		case "checkbox":
+			setCheckboxPos(element, getCheckboxPos(element).x, topPos);
+			break;
+		case "group":
+			setGroupPos(element, getGroupPos(element).x, topPos);
+			break;
+		case "image":
+			setImagePos(element, getImagePos(element).x, topPos);
+			break;
+		}
+		update(0.0f);
+	}
+
+	public void _setBottom(String element, String type, String bottom) {
+		float bottomPos = _evaluateNum(bottom, true);
+
+		switch (type.toLowerCase()) {
+		case "button":
+			setButtonPos(element, getButtonPos(element).x, bottomPos);
+			break;
+		case "slider":
+			setSliderPos(element, getSliderPos(element).x, bottomPos);
+			break;
+		case "progressbar":
+			setProgressBarPos(element, getProgressBarPos(element).x, bottomPos);
+			break;
+		case "label":
+			setLabelPos(element, getLabelPos(element).x, bottomPos);
+			break;
+		case "checkbox":
+			setCheckboxPos(element, getCheckboxPos(element).x, bottomPos);
+			break;
+		case "group":
+			setGroupPos(element, getGroupPos(element).x, bottomPos);
+			break;
+		case "image":
+			setImagePos(element, getImagePos(element).x, bottomPos);
+			break;
+		}
+		update(0.0f);
+	}
+
+	private void _applyStyle(String name, String key, String value) {
+		String element = name.replaceAll("^#", "").replaceAll("\\[\\w+\\]", "");
+		String type = name.replaceAll("^#\\w+\\[", "").replaceAll("[\\[\\]]", "");
+				
+		switch (key.toLowerCase()) {
+		case "left":
+			_setLeft(element, type, value);
+			break;
+		case "right":
+			_setRight(element, type, value);
+			break;
+		case "top":
+			_setTop(element, type, value);
+			break;
+		case "bottom":
+			_setBottom(element, type, value);
+			break;
+		case "width":
+			_setWidth(element, type, value);
+			break;
+		case "height":
+			_setHeight(element, type, value);
+			break;
+		case "opacity":
+			_setOpacity(element, type, value);
+			break;
+		}
 	}
 
 	/**

@@ -210,7 +210,6 @@ public class MGameObject extends Actor {
 				body.getPosition().y - drawSprite.getHeight() / 2.0f);
 
 		this.setRotation((float) Math.toDegrees(body.getAngle()));
-
 	}
 
 }
