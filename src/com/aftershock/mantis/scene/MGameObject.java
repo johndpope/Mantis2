@@ -94,10 +94,12 @@ public class MGameObject extends Actor {
 		bDef.bullet = true;
 		bDef.fixedRotation = !rotate;
 		bDef.type = type;
+		bDef.allowSleep = true;
 
 		body = world.createBody(bDef);
 		body.setUserData(name);
 		body.setTransform(initialPos.x, initialPos.y, 0.0f);
+		body.setSleepingAllowed(true);
 		fixture = body.createFixture(fDef);
 
 		tex = new TextureRegion(texture);
@@ -160,11 +162,12 @@ public class MGameObject extends Actor {
 		bDef.bullet = true;
 		bDef.fixedRotation = !rotate;
 		bDef.type = type;
+		bDef.allowSleep = true;
 
 		body = world.createBody(bDef);
 		body.setUserData(name);
 		body.setTransform(initialPos.x, initialPos.y, 0.0f);
-
+		body.setSleepingAllowed(true);
 		fixture = body.createFixture(fDef);
 
 		this.setRotation((float) Math.toDegrees(body.getAngle()));

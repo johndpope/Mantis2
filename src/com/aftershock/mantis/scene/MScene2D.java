@@ -2,6 +2,7 @@ package com.aftershock.mantis.scene;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 import com.aftershock.mantis.MCallback;
@@ -63,7 +64,7 @@ public class MScene2D extends Stage {
 
 	public int lightRays = 1024;
 	private World _world;
-	private HashMap<String, MGameObject> _objects = new HashMap<String, MGameObject>();
+	private LinkedHashMap<String, MGameObject> _objects = new LinkedHashMap<String, MGameObject>();
 	private HashMap<String, Texture> _texCache = new HashMap<String, Texture>();
 	private HashMap<String, Light> _lights = new HashMap<String, Light>();
 	private HashMap<String, Vector2> _lightangles = new HashMap<String, Vector2>();
