@@ -22,14 +22,15 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
 public class Launcher {
 
-	public static Mantis launch(Game game, String title, int width, int height, boolean resizable, int samples,
-			String iconPrefix) {
+	public static Mantis launch(Game game, String title, int width, int height, boolean resizable, boolean vsync,
+			int samples, String iconPrefix) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = width;
 		config.height = height;
 		config.resizable = resizable;
 		config.samples = samples;
 		config.title = title;
+		config.vSyncEnabled = vsync;
 
 		if (iconPrefix != null) {
 			config.addIcon(iconPrefix + "16.png", FileType.Internal);

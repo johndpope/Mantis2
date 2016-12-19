@@ -1652,7 +1652,7 @@ public class MScene2D extends Stage {
 			if (dlq.peek() != null)
 				dlq.pop().call();
 		}
-		_world.step(1.0f / (60.0f * _timeScale), 1000, 1000);
+		_world.step(1.0f / (60.0f * _timeScale), 10, 8);
 		super.act();
 		for (MBackground bg : _backgroundList) {
 			if (bg.isStatic()) {
