@@ -1956,6 +1956,13 @@ public class MUIPane extends Stage {
 	/*
 	 * CSS PARSING
 	 */
+
+	/**
+	 * Parses a CSS style, applying its contents to the scene.
+	 * 
+	 * @param file
+	 *            The name of the CSS file to parse.
+	 */
 	public void useCSS(String file) {
 		CSSOMParser parser = new CSSOMParser();
 		CSSStyleSheet sheet;
@@ -1976,8 +1983,19 @@ public class MUIPane extends Stage {
 				_applyStyle(rrule, rkey, rval);
 			}
 		}
+		update(0.0f);
 	}
 
+	/**
+	 * Evaluates a position or size string to a numerical value.
+	 * 
+	 * @param num
+	 *            The formatted number string.
+	 * @param vh
+	 *            Whether the input number is relative to the scene's height or
+	 *            width.
+	 * @return The parsed number.
+	 */
 	public float _evaluateNum(String num, boolean vh) {
 		if (num.endsWith("%")) {
 			if (vh) {
@@ -1992,6 +2010,16 @@ public class MUIPane extends Stage {
 		}
 	}
 
+	/**
+	 * Sets the width of a UI element.
+	 * 
+	 * @param element
+	 *            The name of the UI element to modify.
+	 * @param type
+	 *            The type of the UI element to modify.
+	 * @param w
+	 *            The new width.
+	 */
 	public void _setWidth(String element, String type, String w) {
 		switch (type.toLowerCase()) {
 		case "button":
@@ -2016,9 +2044,18 @@ public class MUIPane extends Stage {
 			setImageSize(element, new Vector2(_evaluateNum(w, false), getImageSize(element).y));
 			break;
 		}
-		update(0.0f);
 	}
 
+	/**
+	 * Sets the height of a UI element.
+	 * 
+	 * @param element
+	 *            The name of the UI element to modify.
+	 * @param type
+	 *            The type of the UI element to modify.
+	 * @param h
+	 *            The new height.
+	 */
 	public void _setHeight(String element, String type, String h) {
 		switch (type.toLowerCase()) {
 		case "button":
@@ -2043,9 +2080,18 @@ public class MUIPane extends Stage {
 			setImageSize(element, new Vector2(getImageSize(element).x, _evaluateNum(h, true)));
 			break;
 		}
-		update(0.0f);
 	}
 
+	/**
+	 * Sets the opacity of a UI element.
+	 * 
+	 * @param element
+	 *            The name of the UI element to modify.
+	 * @param type
+	 *            The type of the UI element to modify.
+	 * @param op
+	 *            The new opacity.
+	 */
 	public void _setOpacity(String element, String type, String op) {
 		switch (type.toLowerCase()) {
 		case "button":
@@ -2070,9 +2116,18 @@ public class MUIPane extends Stage {
 			setImageOpacity(element, Float.parseFloat(op));
 			break;
 		}
-		update(0.0f);
 	}
 
+	/**
+	 * Sets the left-oriented position of a UI element.
+	 * 
+	 * @param element
+	 *            The name of the UI element to modify.
+	 * @param type
+	 *            The type of the UI element to modify.
+	 * @param left
+	 *            The new left-oriented position.
+	 */
 	public void _setLeft(String element, String type, String left) {
 		float leftPos = _evaluateNum(left, false);
 
@@ -2099,9 +2154,18 @@ public class MUIPane extends Stage {
 			setImagePos(element, leftPos, getImagePos(element).y);
 			break;
 		}
-		update(0.0f);
 	}
 
+	/**
+	 * Sets the right-oriented position of a UI element.
+	 * 
+	 * @param element
+	 *            The name of the UI element to modify.
+	 * @param type
+	 *            The type of the UI element to modify.
+	 * @param right
+	 *            The new right-oriented position.
+	 */
 	public void _setRight(String element, String type, String right) {
 		float rightPos = this.getWidth() - _evaluateNum(right, false);
 
@@ -2128,9 +2192,18 @@ public class MUIPane extends Stage {
 			setImagePos(element, rightPos, getImagePos(element).y);
 			break;
 		}
-		update(0.0f);
 	}
 
+	/**
+	 * Sets the top-oriented position of a UI element.
+	 * 
+	 * @param element
+	 *            The name of the UI element to modify.
+	 * @param type
+	 *            The type of the UI element to modify.
+	 * @param top
+	 *            The new top-oriented position.
+	 */
 	public void _setTop(String element, String type, String top) {
 		float topPos = this.getHeight() - _evaluateNum(top, true);
 
@@ -2157,9 +2230,18 @@ public class MUIPane extends Stage {
 			setImagePos(element, getImagePos(element).x, topPos);
 			break;
 		}
-		update(0.0f);
 	}
 
+	/**
+	 * Sets the bottom-oriented position of a UI element.
+	 * 
+	 * @param element
+	 *            The name of the UI element to modify.
+	 * @param type
+	 *            The type of the UI element to modify.
+	 * @param bottom
+	 *            The new bottom-oriented position.
+	 */
 	public void _setBottom(String element, String type, String bottom) {
 		float bottomPos = _evaluateNum(bottom, true);
 
@@ -2186,9 +2268,18 @@ public class MUIPane extends Stage {
 			setImagePos(element, getImagePos(element).x, bottomPos);
 			break;
 		}
-		update(0.0f);
 	}
 
+	/**
+	 * Applies a style pair to a given element name.
+	 * 
+	 * @param name
+	 *            The name of the element to apply the style to.
+	 * @param key
+	 *            The style key.
+	 * @param value
+	 *            The style value.
+	 */
 	private void _applyStyle(String name, String key, String value) {
 		String element = name.replaceAll("^#", "").replaceAll("\\[\\w+\\]", "");
 		String type = name.replaceAll("^#\\w+\\[", "").replaceAll("[\\[\\]]", "");
@@ -2222,6 +2313,12 @@ public class MUIPane extends Stage {
 	 * XML PARSING
 	 */
 
+	/**
+	 * Parse an XML file, loading it's contents to the pane.
+	 * 
+	 * @param file
+	 *            The XML file to parse.
+	 */
 	public void useXML(String file) {
 		FileHandle handle = Gdx.files.internal("assets/ui/structure/" + file);
 		Document doc;
@@ -2235,17 +2332,45 @@ public class MUIPane extends Stage {
 		update(0.0f);
 	}
 
+	/**
+	 * Adds a button to the pane from an XML stage.
+	 * 
+	 * @param name
+	 *            The name of the button.
+	 * @param group
+	 *            The parent group, if any.
+	 * @param style
+	 *            The style of the button.
+	 * @param text
+	 *            The button's label text.
+	 */
 	private void _addButton(String name, String group, String style, String text) {
+		if (text == null) {
+			text = "";
+		}
 		createButton(name, style, text);
 		if (group != null) {
 			addElementToGroup(group, ElementType.BUTTON, name);
 		}
 	}
 
+	/**
+	 * Add a group to the pane from an XML stage.
+	 * 
+	 * @param name
+	 *            The name of the group.
+	 */
 	private void _addGroup(String name) {
 		createGroup(name);
 	}
 
+	/**
+	 * Parses an alignment string.
+	 * 
+	 * @param align
+	 *            The input alignment string.
+	 * @return The integer ID of the input string.
+	 */
 	private int _getAlign(String align) {
 		switch (align.toLowerCase()) {
 		case "left":
@@ -2271,7 +2396,24 @@ public class MUIPane extends Stage {
 		}
 	}
 
+	/**
+	 * Adds a label to the pane from an XML stage.
+	 * 
+	 * @param name
+	 *            The name of the label.
+	 * @param group
+	 *            The parent group, if any.
+	 * @param style
+	 *            The style of the label.
+	 * @param align
+	 *            The alignment of the label text.
+	 * @param text
+	 *            The text of the label.
+	 */
 	private void _addLabel(String name, String group, String style, String align, String text) {
+		if (align == null) {
+			align = "left";
+		}
 		createLabel(name, style, _getAlign(align));
 		setLabelText(name, text);
 		if (group != null) {
@@ -2279,8 +2421,40 @@ public class MUIPane extends Stage {
 		}
 	}
 
+	/**
+	 * Adds a progress bar to the pane from an XML stage.
+	 * 
+	 * @param name
+	 *            The name of the progress bar.
+	 * @param group
+	 *            The parent group, if any.
+	 * @param style
+	 *            The style of the progress bar.
+	 * @param min
+	 *            The minimum progress bar value.
+	 * @param max
+	 *            The maximum progress bar value.
+	 * @param step
+	 *            The progress bar increment.
+	 * @param defval
+	 *            The default progress value.
+	 * @param vertical
+	 *            Whether or not the progress bar is vertical.
+	 */
 	private void _addProgressBar(String name, String group, String style, String min, String max, String step,
 			String defval, boolean vertical) {
+		if (min == null) {
+			min = "0.0";
+		}
+		if (max == null) {
+			max = "1.0";
+		}
+		if (step == null) {
+			step = "0.01";
+		}
+		if (defval == null) {
+			defval = "0.0";
+		}
 		createProgressBar(name, style, Float.parseFloat(min), Float.parseFloat(max), Float.parseFloat(step),
 				Float.parseFloat(defval), vertical);
 		if (group != null) {
@@ -2288,6 +2462,18 @@ public class MUIPane extends Stage {
 		}
 	}
 
+	/**
+	 * Adds a checkbox to the pane from an XML stage.
+	 * 
+	 * @param name
+	 *            The name of the checkbox.
+	 * @param group
+	 *            The parent group, if any.
+	 * @param style
+	 *            The style of the checkbox.
+	 * @param defval
+	 *            The default value of the checkbox.
+	 */
 	private void _addCheckbox(String name, String group, String style, boolean defval) {
 		createCheckbox(name, style, defval);
 		if (group != null) {
@@ -2295,8 +2481,40 @@ public class MUIPane extends Stage {
 		}
 	}
 
+	/**
+	 * Adds a slider to the pane from an XML stage.
+	 * 
+	 * @param name
+	 *            The name of the slider.
+	 * @param group
+	 *            The parent group, if any.
+	 * @param style
+	 *            The style of the slider.
+	 * @param min
+	 *            The minimum slider value.
+	 * @param max
+	 *            The maximum slider value.
+	 * @param step
+	 *            The slider increment.
+	 * @param defval
+	 *            The default value of the slider.
+	 * @param vertical
+	 *            Whether or not the slider is vertical.
+	 */
 	private void _addSlider(String name, String group, String style, String min, String max, String step, String defval,
 			boolean vertical) {
+		if (min == null) {
+			min = "0.0";
+		}
+		if (max == null) {
+			max = "1.0";
+		}
+		if (step == null) {
+			step = "0.01";
+		}
+		if (defval == null) {
+			defval = "0.0";
+		}
 		createSlider(name, style, Float.parseFloat(min), Float.parseFloat(max), Float.parseFloat(step),
 				Float.parseFloat(defval), vertical);
 		if (group != null) {
@@ -2304,6 +2522,16 @@ public class MUIPane extends Stage {
 		}
 	}
 
+	/**
+	 * Adds an image to the pane from an XML stage.
+	 * 
+	 * @param name
+	 *            The name of the image.
+	 * @param group
+	 *            The parent group, if any.
+	 * @param src
+	 *            The image file path.
+	 */
 	private void _addImage(String name, String group, String src) {
 		createImage(name, src);
 		if (group != null) {
@@ -2311,6 +2539,16 @@ public class MUIPane extends Stage {
 		}
 	}
 
+	/**
+	 * Parses an XML layer, and it's children recursively.
+	 * 
+	 * @param parentType
+	 *            The type of the parent node, if such a node exists.
+	 * @param parent
+	 *            The name of the parent node, if such a node exists.
+	 * @param layer
+	 *            The layer to parse.
+	 */
 	private void _parseLayer(String parentType, String parent, NodeList layer) {
 		for (int i = 0; i < layer.getLength(); i++) {
 			if (layer.item(i).getNodeType() == Node.ELEMENT_NODE) {
@@ -2371,6 +2609,13 @@ public class MUIPane extends Stage {
 		}
 	}
 
+	/**
+	 * Casts a Node to an Element.
+	 * 
+	 * @param n
+	 *            The node to convert.
+	 * @return The Element-casted Node.
+	 */
 	private Element _toElem(Node n) {
 		return (Element) n;
 	}

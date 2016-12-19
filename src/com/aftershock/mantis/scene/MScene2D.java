@@ -1808,6 +1808,15 @@ public class MScene2D extends Stage {
 	}
 
 	/**
+	 * Gets the center point of the scene.
+	 * 
+	 * @return The scene's center point.
+	 */
+	public Vector2 getCenter() {
+		return new Vector2(getWidth() / 2, getHeight() / 2);
+	}
+
+	/**
 	 * Disposes of the scene and all of it's resources.
 	 */
 	@Override
