@@ -4,13 +4,22 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.w3c.css.sac.InputSource;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.css.CSSStyleRule;
 import org.w3c.dom.css.CSSStyleSheet;
+import org.xml.sax.SAXException;
 
 import com.aftershock.mantis.MCallback;
 import com.aftershock.mantis.scene.util.MUIRef;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -34,6 +43,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.steadystate.css.parser.CSSOMParser;
 
 /*
@@ -1943,6 +1953,9 @@ public class MUIPane extends Stage {
 		dlq.add(callback);
 	}
 
+	/*
+	 * CSS PARSING
+	 */
 	public void useCSS(String file) {
 		CSSOMParser parser = new CSSOMParser();
 		CSSStyleSheet sheet;
@@ -2179,7 +2192,7 @@ public class MUIPane extends Stage {
 	private void _applyStyle(String name, String key, String value) {
 		String element = name.replaceAll("^#", "").replaceAll("\\[\\w+\\]", "");
 		String type = name.replaceAll("^#\\w+\\[", "").replaceAll("[\\[\\]]", "");
-				
+
 		switch (key.toLowerCase()) {
 		case "left":
 			_setLeft(element, type, value);
@@ -2203,6 +2216,163 @@ public class MUIPane extends Stage {
 			_setOpacity(element, type, value);
 			break;
 		}
+	}
+
+	/*
+	 * XML PARSING
+	 */
+
+	public void useXML(String file) {
+		FileHandle handle = Gdx.files.internal("assets/ui/structure/" + file);
+		Document doc;
+		try {
+			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(handle.file());
+		} catch (SAXException | IOException | ParserConfigurationException e) {
+			e.printStackTrace();
+			return;
+		}
+		_parseLayer(null, null, doc.getChildNodes());
+		update(0.0f);
+	}
+
+	private void _addButton(String name, String group, String style, String text) {
+		createButton(name, style, text);
+		if (group != null) {
+			addElementToGroup(group, ElementType.BUTTON, name);
+		}
+	}
+
+	private void _addGroup(String name) {
+		createGroup(name);
+	}
+
+	private int _getAlign(String align) {
+		switch (align.toLowerCase()) {
+		case "left":
+			return Align.left;
+		case "right":
+			return Align.right;
+		case "top":
+			return Align.top;
+		case "bottom":
+			return Align.bottom;
+		case "center":
+			return Align.center;
+		case "topleft":
+			return Align.topLeft;
+		case "topright":
+			return Align.topRight;
+		case "bottomleft":
+			return Align.bottomLeft;
+		case "bottomright":
+			return Align.bottomRight;
+		default:
+			return -1;
+		}
+	}
+
+	private void _addLabel(String name, String group, String style, String align, String text) {
+		createLabel(name, style, _getAlign(align));
+		setLabelText(name, text);
+		if (group != null) {
+			addElementToGroup(group, ElementType.LABEL, name);
+		}
+	}
+
+	private void _addProgressBar(String name, String group, String style, String min, String max, String step,
+			String defval, boolean vertical) {
+		createProgressBar(name, style, Float.parseFloat(min), Float.parseFloat(max), Float.parseFloat(step),
+				Float.parseFloat(defval), vertical);
+		if (group != null) {
+			addElementToGroup(group, ElementType.PBAR, name);
+		}
+	}
+
+	private void _addCheckbox(String name, String group, String style, boolean defval) {
+		createCheckbox(name, style, defval);
+		if (group != null) {
+			addElementToGroup(group, ElementType.CHECKBOX, name);
+		}
+	}
+
+	private void _addSlider(String name, String group, String style, String min, String max, String step, String defval,
+			boolean vertical) {
+		createSlider(name, style, Float.parseFloat(min), Float.parseFloat(max), Float.parseFloat(step),
+				Float.parseFloat(defval), vertical);
+		if (group != null) {
+			addElementToGroup(group, ElementType.SLIDER, name);
+		}
+	}
+
+	private void _addImage(String name, String group, String src) {
+		createImage(name, src);
+		if (group != null) {
+			addElementToGroup(group, ElementType.IMAGE, name);
+		}
+	}
+
+	private void _parseLayer(String parentType, String parent, NodeList layer) {
+		for (int i = 0; i < layer.getLength(); i++) {
+			if (layer.item(i).getNodeType() == Node.ELEMENT_NODE) {
+				Element elem = _toElem(layer.item(i));
+
+				// Generic
+				String type = elem.getTagName().trim();
+				String val = elem.getTextContent().trim();
+				String name = elem.getAttribute("name");
+				String style = elem.getAttribute("style");
+
+				// Label
+				String align = elem.getAttribute("align");
+
+				// Progress Bar, Slider
+				String min = elem.getAttribute("min");
+				String max = elem.getAttribute("max");
+				String step = elem.getAttribute("step");
+				String defval = elem.getAttribute("default");
+				String vertical = elem.getAttribute("vertical");
+
+				// Checkbox
+				String checked = elem.getAttribute("checked");
+
+				String src = elem.getAttribute("src");
+
+				String group = null;
+				if (parent != null && parentType != null) {
+					if (parentType.equals("group")) {
+						group = parent;
+					}
+				}
+				switch (type.toLowerCase()) {
+				case "button":
+					_addButton(name, group, style, val);
+					break;
+				case "group":
+					_addGroup(name);
+					break;
+				case "label":
+					_addLabel(name, group, style, align, val);
+					break;
+				case "progressbar":
+					_addProgressBar(name, group, style, min, max, step, defval, !(vertical == null));
+					break;
+				case "checkbox":
+					_addCheckbox(name, group, style, !(checked == null));
+					break;
+				case "slider":
+					_addSlider(name, group, style, min, max, step, defval, !(vertical == null));
+					break;
+				case "image":
+					_addImage(name, group, src);
+					break;
+				}
+				_parseLayer(type, name, layer.item(i).getChildNodes());
+			}
+		}
+	}
+
+	private Element _toElem(Node n) {
+		return (Element) n;
 	}
 
 	/**
