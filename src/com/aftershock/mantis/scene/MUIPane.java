@@ -1983,7 +1983,6 @@ public class MUIPane extends Stage {
 				_applyStyle(rrule, rkey, rval);
 			}
 		}
-		update(0.0f);
 	}
 
 	/**
@@ -2044,6 +2043,7 @@ public class MUIPane extends Stage {
 			setImageSize(element, new Vector2(_evaluateNum(w, false), getImageSize(element).y));
 			break;
 		}
+		update(0.0f);
 	}
 
 	/**
@@ -2080,6 +2080,7 @@ public class MUIPane extends Stage {
 			setImageSize(element, new Vector2(getImageSize(element).x, _evaluateNum(h, true)));
 			break;
 		}
+		update(0.0f);
 	}
 
 	/**
@@ -2116,6 +2117,7 @@ public class MUIPane extends Stage {
 			setImageOpacity(element, Float.parseFloat(op));
 			break;
 		}
+		update(0.0f);
 	}
 
 	/**
@@ -2154,6 +2156,7 @@ public class MUIPane extends Stage {
 			setImagePos(element, leftPos, getImagePos(element).y);
 			break;
 		}
+		update(0.0f);
 	}
 
 	/**
@@ -2192,6 +2195,7 @@ public class MUIPane extends Stage {
 			setImagePos(element, rightPos, getImagePos(element).y);
 			break;
 		}
+		update(0.0f);
 	}
 
 	/**
@@ -2230,6 +2234,7 @@ public class MUIPane extends Stage {
 			setImagePos(element, getImagePos(element).x, topPos);
 			break;
 		}
+		update(0.0f);
 	}
 
 	/**
@@ -2268,6 +2273,7 @@ public class MUIPane extends Stage {
 			setImagePos(element, getImagePos(element).x, bottomPos);
 			break;
 		}
+		update(0.0f);
 	}
 
 	/**
