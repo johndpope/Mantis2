@@ -1,7 +1,6 @@
 package com.aftershock.mantis.scene;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
@@ -65,16 +64,16 @@ public class MScene2D extends Stage {
 	public int lightRays = 1024;
 	private World _world;
 	private LinkedHashMap<String, MGameObject> _objects = new LinkedHashMap<String, MGameObject>();
-	private HashMap<String, Texture> _texCache = new HashMap<String, Texture>();
-	private HashMap<String, Light> _lights = new HashMap<String, Light>();
-	private HashMap<String, Vector2> _lightangles = new HashMap<String, Vector2>();
-	private HashMap<String, MBackground> _backgrounds = new HashMap<String, MBackground>();
+	private LinkedHashMap<String, Texture> _texCache = new LinkedHashMap<String, Texture>();
+	private LinkedHashMap<String, Light> _lights = new LinkedHashMap<String, Light>();
+	private LinkedHashMap<String, Vector2> _lightangles = new LinkedHashMap<String, Vector2>();
+	private LinkedHashMap<String, MBackground> _backgrounds = new LinkedHashMap<String, MBackground>();
 	private ArrayList<MBackground> _backgroundList = new ArrayList<MBackground>();
-	private HashMap<String, Sound> _sounds = new HashMap<String, Sound>();
-	private HashMap<String, Music> _music = new HashMap<String, Music>();
-	private HashMap<String, MParticleSystem> _particleSystems = new HashMap<String, MParticleSystem>();
-	private HashMap<String, MGameEntity> _entities = new HashMap<String, MGameEntity>();
-	private HashMap<String, MPhysHook> _physHooks = new HashMap<String, MPhysHook>();
+	private LinkedHashMap<String, Sound> _sounds = new LinkedHashMap<String, Sound>();
+	private LinkedHashMap<String, Music> _music = new LinkedHashMap<String, Music>();
+	private LinkedHashMap<String, MParticleSystem> _particleSystems = new LinkedHashMap<String, MParticleSystem>();
+	private LinkedHashMap<String, MGameEntity> _entities = new LinkedHashMap<String, MGameEntity>();
+	private LinkedHashMap<String, MPhysHook> _physHooks = new LinkedHashMap<String, MPhysHook>();
 	private float _timeScale = 1.0f;
 	private float _volume = 1.0f, _pitch = 1.0f, _pan = 1.0f;
 	public ShaderProgram shader;
@@ -1817,6 +1816,21 @@ public class MScene2D extends Stage {
 	}
 
 	/**
+	 * Clears the scene.
+	 */
+	public void clearScene() {
+		for (String object : _objects.keySet()) {
+			destroyGObject(object);
+		}
+		for (String ent : _entities.keySet()) {
+			destroyEnt(ent);
+		}
+		for (String light : _lights.keySet()) {
+			destroyLight(light);
+		}
+	}
+
+	/**
 	 * Disposes of the scene and all of it's resources.
 	 */
 	@Override
@@ -1831,6 +1845,7 @@ public class MScene2D extends Stage {
 			m.dispose();
 		if (shader != null)
 			shader.dispose();
+		clearScene();
 		System.gc();
 	}
 }

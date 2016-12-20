@@ -1,7 +1,7 @@
 package com.aftershock.mantis.scene;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -64,20 +64,20 @@ import com.steadystate.css.parser.CSSOMParser;
 
 public class MUIPane extends Stage {
 
-	private HashMap<String, BitmapFont> _fonts = new HashMap<String, BitmapFont>();
-	private HashMap<String, Label> _labels = new HashMap<String, Label>();
-	private HashMap<String, LabelStyle> _labelStyles = new HashMap<String, LabelStyle>();
-	private HashMap<String, TextButtonStyle> _buttonStyles = new HashMap<String, TextButtonStyle>();
-	private HashMap<String, TextButton> _buttons = new HashMap<String, TextButton>();
-	private HashMap<String, ProgressBarStyle> _pbarStyles = new HashMap<String, ProgressBarStyle>();
-	private HashMap<String, ProgressBar> _pbars = new HashMap<String, ProgressBar>();
-	private HashMap<String, Boolean> _pbarorients = new HashMap<String, Boolean>();
-	private HashMap<String, SliderStyle> _sliderStyles = new HashMap<String, SliderStyle>();
-	private HashMap<String, Slider> _sliders = new HashMap<String, Slider>();
-	private HashMap<String, CheckBoxStyle> _checkboxStyles = new HashMap<String, CheckBoxStyle>();
-	private HashMap<String, CheckBox> _checkboxes = new HashMap<String, CheckBox>();
-	private HashMap<String, Group> _groups = new HashMap<String, Group>();
-	private HashMap<String, Image> _images = new HashMap<String, Image>();
+	private LinkedHashMap<String, BitmapFont> _fonts = new LinkedHashMap<String, BitmapFont>();
+	private LinkedHashMap<String, Label> _labels = new LinkedHashMap<String, Label>();
+	private LinkedHashMap<String, LabelStyle> _labelStyles = new LinkedHashMap<String, LabelStyle>();
+	private LinkedHashMap<String, TextButtonStyle> _buttonStyles = new LinkedHashMap<String, TextButtonStyle>();
+	private LinkedHashMap<String, TextButton> _buttons = new LinkedHashMap<String, TextButton>();
+	private LinkedHashMap<String, ProgressBarStyle> _pbarStyles = new LinkedHashMap<String, ProgressBarStyle>();
+	private LinkedHashMap<String, ProgressBar> _pbars = new LinkedHashMap<String, ProgressBar>();
+	private LinkedHashMap<String, Boolean> _pbarorients = new LinkedHashMap<String, Boolean>();
+	private LinkedHashMap<String, SliderStyle> _sliderStyles = new LinkedHashMap<String, SliderStyle>();
+	private LinkedHashMap<String, Slider> _sliders = new LinkedHashMap<String, Slider>();
+	private LinkedHashMap<String, CheckBoxStyle> _checkboxStyles = new LinkedHashMap<String, CheckBoxStyle>();
+	private LinkedHashMap<String, CheckBox> _checkboxes = new LinkedHashMap<String, CheckBox>();
+	private LinkedHashMap<String, Group> _groups = new LinkedHashMap<String, Group>();
+	private LinkedHashMap<String, Image> _images = new LinkedHashMap<String, Image>();
 
 	private LinkedList<MCallback> dlq = new LinkedList<MCallback>();
 
@@ -2624,6 +2624,33 @@ public class MUIPane extends Stage {
 	 */
 	private Element _toElem(Node n) {
 		return (Element) n;
+	}
+
+	/**
+	 * Removes all elements from the scene.
+	 */
+	public void clearPane() {
+		for (String key : _buttons.keySet()) {
+			removeButton(key);
+		}
+		for (String key : _pbars.keySet()) {
+			removeProgressBar(key);
+		}
+		for (String key : _groups.keySet()) {
+			removeGroup(key);
+		}
+		for (String key : _sliders.keySet()) {
+			removeSlider(key);
+		}
+		for (String key : _images.keySet()) {
+			removeImage(key);
+		}
+		for (String key : _labels.keySet()) {
+			removeLabel(key);
+		}
+		for (String key : _checkboxes.keySet()) {
+			removeCheckbox(key);
+		}
 	}
 
 	/**
