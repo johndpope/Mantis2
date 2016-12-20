@@ -369,7 +369,7 @@ public class MScene2D extends Stage {
 	 *            Mask bit.
 	 */
 	public void createGObject(String name, BodyType type, Vector2 initialPos, Vector2 initialSize, String texture,
-			boolean circle, boolean rotate, short cat, short group, short mask) {
+			boolean circle, boolean rotate, int cat, int group, int mask) {
 		doLater(() -> {
 			MGameObject newObject = null;
 
@@ -411,12 +411,78 @@ public class MScene2D extends Stage {
 	 *            Mask bit.
 	 */
 	public void createGObject(String name, BodyType type, Vector2 initialPos, Vector2 initialSize,
-			TextureRegion texture, boolean circle, boolean rotate, short cat, short group, short mask) {
+			TextureRegion texture, boolean circle, boolean rotate, int cat, int group, int mask) {
 		doLater(() -> {
 			MGameObject newObject = null;
 
-			newObject = new MGameObject(_world, name, type, initialPos, initialSize, texture, circle, rotate,
-					(short) cat, (short) group, (short) mask);
+			newObject = new MGameObject(_world, name, type, initialPos, initialSize, texture, circle, rotate, (int) cat,
+					(int) group, (int) mask);
+
+			_objects.put(name, newObject);
+			this.addActor(newObject);
+		});
+	}
+
+	/**
+	 * Creates a game object.
+	 * 
+	 * @param name
+	 *            The name of the object.
+	 * @param type
+	 *            Object physics type.
+	 * @param initialPos
+	 *            Initial position of the object.
+	 * @param initialSize
+	 *            Initial size of the object.
+	 * @param texture
+	 *            Texture of the object.
+	 * @param circle
+	 *            Whether or not to treat the object as a circle.
+	 * @param rotate
+	 *            Does physics object rotate.
+	 */
+	public void createGObject(String name, BodyType type, Vector2 initialPos, Vector2 initialSize, String texture,
+			boolean circle, boolean rotate) {
+		doLater(() -> {
+			MGameObject newObject = null;
+
+			if (_texCache.containsKey(texture)) {
+				newObject = new MGameObject(_world, name, type, initialPos, initialSize, _texCache.get(texture), circle,
+						rotate);
+			} else {
+				_texCache.put(texture, new Texture(Gdx.files.internal("assets/textures/" + texture)));
+				newObject = new MGameObject(_world, name, type, initialPos, initialSize, _texCache.get(texture), circle,
+						rotate);
+			}
+			_objects.put(name, newObject);
+			this.addActor(newObject);
+		});
+	}
+
+	/**
+	 * Creates a game object.
+	 * 
+	 * @param name
+	 *            The name of the object.
+	 * @param type
+	 *            Object physics type.
+	 * @param initialPos
+	 *            Initial position of the object.
+	 * @param initialSize
+	 *            Initial size of the object.
+	 * @param texture
+	 *            Texture region of the object.
+	 * @param circle
+	 *            Whether or not to treat the object as a circle.
+	 * @param rotate
+	 *            Does physics object rotate.
+	 */
+	public void createGObject(String name, BodyType type, Vector2 initialPos, Vector2 initialSize,
+			TextureRegion texture, boolean circle, boolean rotate) {
+		doLater(() -> {
+			MGameObject newObject = null;
+
+			newObject = new MGameObject(_world, name, type, initialPos, initialSize, texture, circle, rotate);
 
 			_objects.put(name, newObject);
 			this.addActor(newObject);
@@ -639,40 +705,62 @@ public class MScene2D extends Stage {
 	 *            Mask bit.
 	 */
 	public void createLight(String name, float x, float y, LightType type, float dist, float ang, float coneAngle,
-			Color c, short cat, short group, short mask) {
-		doLater(() -> {
-			switch (type) {
-			case POINT:
-				PointLight point = new PointLight(handler, lightRays);
+			Color c, int cat, int group, int mask) {
+		createLight(name, x, y, type, dist, ang, coneAngle, 0.0f, c, cat, group, mask);
+	}
 
-				point.setPosition(x, y);
-				point.setDistance(dist);
-				point.setColor(c);
-				point.setSoftnessLength(0);
-				point.setContactFilter(cat, group, mask);
-				_lights.put(name, point);
-				_lightangles.put(name, new Vector2(0.0f, 0.0f));
-				break;
-			case SPOT:
-				ConeLight cone = new ConeLight(handler, lightRays, c, dist, x, y, ang, coneAngle);
+	/**
+	 * Create a light and add it to the scene.
+	 * 
+	 * @param name
+	 *            The name of the light.
+	 * @param x
+	 *            X position of the light.
+	 * @param y
+	 *            Y position of the light.
+	 * @param type
+	 *            The light's type (POINT | SPOT | DIRECTIONAL).
+	 * @param dist
+	 *            Light radius/distance.
+	 * @param ang
+	 *            Facing angle of the light.
+	 * @param coneAngle
+	 *            Cone angle of the light.
+	 * @param softness
+	 *            Softness of the light.
+	 * @param c
+	 *            The light's color.
+	 */
+	public void createLight(String name, float x, float y, LightType type, float dist, float ang, float coneAngle,
+			Color c) {
+		createLight(name, x, y, type, dist, ang, coneAngle, c, 0, 0, 0);
+	}
 
-				cone.setSoftnessLength(0);
-				cone.setContactFilter(cat, group, mask);
-				_lights.put(name, cone);
-				_lightangles.put(name, new Vector2(ang, coneAngle));
-				break;
-			case DIRECTIONAL:
-				DirectionalLight dirLight = new DirectionalLight(handler, lightRays, c, ang);
-
-				dirLight.setSoftnessLength(0);
-				dirLight.setContactFilter(cat, group, mask);
-				_lights.put(name, dirLight);
-				_lightangles.put(name, new Vector2(ang, 0.0f));
-				break;
-			default:
-				return;
-			}
-		});
+	/**
+	 * Create a light and add it to the scene.
+	 * 
+	 * @param name
+	 *            The name of the light.
+	 * @param x
+	 *            X position of the light.
+	 * @param y
+	 *            Y position of the light.
+	 * @param type
+	 *            The light's type (POINT | SPOT | DIRECTIONAL).
+	 * @param dist
+	 *            Light radius/distance.
+	 * @param ang
+	 *            Facing angle of the light.
+	 * @param coneAngle
+	 *            Cone angle of the light.
+	 * @param softness
+	 *            Softness of the light.
+	 * @param c
+	 *            The light's color.
+	 */
+	public void createLight(String name, float x, float y, LightType type, float dist, float ang, float coneAngle,
+			float softness, Color c) {
+		createLight(name, x, y, type, dist, ang, coneAngle, 0.0f, c, 0, 0, 0);
 	}
 
 	/**
@@ -704,32 +792,30 @@ public class MScene2D extends Stage {
 	 *            Mask bit.
 	 */
 	public void createLight(String name, float x, float y, LightType type, float dist, float ang, float coneAngle,
-			float softness, Color c, short cat, short group, short mask) {
+			float softness, Color c, int cat, int group, int mask) {
 		doLater(() -> {
 			switch (type) {
 			case POINT:
 				PointLight point = new PointLight(handler, lightRays);
-
 				point.setPosition(x, y);
 				point.setDistance(dist);
 				point.setColor(c);
 				point.setSoftnessLength(softness);
-				point.setContactFilter(cat, group, mask);
+				point.setContactFilter((short) cat, (short) group, (short) mask);
 				_lights.put(name, point);
 				_lightangles.put(name, new Vector2(0.0f, 0.0f));
 				break;
 			case SPOT:
 				ConeLight cone = new ConeLight(handler, lightRays, c, dist, x, y, ang, coneAngle);
-
 				cone.setSoftnessLength(0);
-				cone.setContactFilter(cat, group, mask);
+				cone.setContactFilter((short) cat, (short) group, (short) mask);
 				cone.setSoftnessLength(softness);
 				_lights.put(name, cone);
 				_lightangles.put(name, new Vector2(ang, coneAngle));
 				break;
 			case DIRECTIONAL:
 				DirectionalLight dirLight = new DirectionalLight(handler, lightRays, c, ang);
-				dirLight.setContactFilter(cat, group, mask);
+				dirLight.setContactFilter((short) cat, (short) group, (short) mask);
 				dirLight.setSoftnessLength(0);
 				_lights.put(name, dirLight);
 				_lightangles.put(name, new Vector2(ang, 0.0f));

@@ -68,15 +68,15 @@ public class MGameObject extends Actor {
 	 *            Mask bit.
 	 */
 	public MGameObject(World world, String name, BodyType type, Vector2 initialPos, Vector2 initialSize,
-			Texture texture, boolean circular, boolean rotate, short cat, short group, short mask) {
+			Texture texture, boolean circular, boolean rotate, int cat, int group, int mask) {
 		FixtureDef fDef = new FixtureDef();
 		fDef.density = 1f;
 		fDef.friction = 0.5f;
 		fDef.restitution = 0.25f;
 
-		fDef.filter.categoryBits = cat;
-		fDef.filter.groupIndex = group;
-		fDef.filter.maskBits = mask;
+		fDef.filter.categoryBits = (short) cat;
+		fDef.filter.groupIndex = (short) group;
+		fDef.filter.maskBits = (short) mask;
 
 		Shape shape;
 
@@ -137,45 +137,54 @@ public class MGameObject extends Actor {
 	 *            Mask bit.
 	 */
 	public MGameObject(World world, String name, BodyType type, Vector2 initialPos, Vector2 initialSize,
-			TextureRegion texture, boolean circular, boolean rotate, short cat, short group, short mask) {
-		FixtureDef fDef = new FixtureDef();
-		fDef.density = 1f;
-		fDef.friction = 0.5f;
-		fDef.restitution = 0.25f;
+			TextureRegion texture, boolean circular, boolean rotate, int cat, int group, int mask) {
+		this(world, name, type, initialPos, initialSize, texture.getTexture(), circular, rotate, cat, group, mask);
+	}
 
-		fDef.filter.categoryBits = cat;
-		fDef.filter.groupIndex = group;
-		fDef.filter.maskBits = mask;
+	/**
+	 * @param world
+	 *            World to use for physics.
+	 * @param name
+	 *            Name of the object.
+	 * @param type
+	 *            Physical type of the object.
+	 * @param initialPos
+	 *            Initial position of the object.
+	 * @param initialSize
+	 *            Initial size of the object.
+	 * @param texture
+	 *            The object's texture.
+	 * @param circular
+	 *            Whether or not to treat this object as a circle.
+	 * @param rotate
+	 *            Whether or not this object can rotate.
+	 */
+	public MGameObject(World world, String name, BodyType type, Vector2 initialPos, Vector2 initialSize,
+			TextureRegion texture, boolean circular, boolean rotate) {
+		this(world, name, type, initialPos, initialSize, texture.getTexture(), circular, rotate, 0, 0, 0);
+	}
 
-		Shape shape;
-
-		if (circular) {
-			shape = new CircleShape();
-			((CircleShape) shape).setRadius(initialSize.x);
-		} else {
-			shape = new PolygonShape();
-			((PolygonShape) shape).setAsBox(initialSize.x, initialSize.y);
-		}
-		fDef.shape = shape;
-
-		BodyDef bDef = new BodyDef();
-		bDef.bullet = true;
-		bDef.fixedRotation = !rotate;
-		bDef.type = type;
-		bDef.allowSleep = true;
-
-		body = world.createBody(bDef);
-		body.setUserData(name);
-		body.setTransform(initialPos.x, initialPos.y, 0.0f);
-		body.setSleepingAllowed(true);
-		fixture = body.createFixture(fDef);
-
-		this.setRotation((float) Math.toDegrees(body.getAngle()));
-		this.setSize(initialSize.x, initialSize.y);
-
-		tex = texture;
-		drawSprite = new Sprite(tex);
-		drawSprite.setSize(this.getWidth(), this.getHeight());
+	/**
+	 * @param world
+	 *            World to use for physics.
+	 * @param name
+	 *            Name of the object.
+	 * @param type
+	 *            Physical type of the object.
+	 * @param initialPos
+	 *            Initial position of the object.
+	 * @param initialSize
+	 *            Initial size of the object.
+	 * @param texture
+	 *            The object's texture.
+	 * @param circular
+	 *            Whether or not to treat this object as a circle.
+	 * @param rotate
+	 *            Whether or not this object can rotate.
+	 */
+	public MGameObject(World world, String name, BodyType type, Vector2 initialPos, Vector2 initialSize,
+			Texture texture, boolean circular, boolean rotate) {
+		this(world, name, type, initialPos, initialSize, texture, circular, rotate, 0, 0, 0);
 	}
 
 	@Override
