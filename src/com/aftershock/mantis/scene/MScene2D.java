@@ -714,6 +714,35 @@ public class MScene2D extends Stage {
 	 * 
 	 * @param name
 	 *            The name of the light.
+	 * @param pos
+	 *            The position of the light.
+	 * @param type
+	 *            The light's type (POINT | SPOT | DIRECTIONAL).
+	 * @param dist
+	 *            Light radius/distance.
+	 * @param ang
+	 *            Facing angle of the light.
+	 * @param coneAngle
+	 *            Cone angle of the light.
+	 * @param c
+	 *            The light's color.
+	 * @param cat
+	 *            Category bit.
+	 * @param group
+	 *            Group bit.
+	 * @param mask
+	 *            Mask bit.
+	 */
+	public void createLight(String name, Vector2 pos, LightType type, float dist, float ang, float coneAngle, Color c,
+			int cat, int group, int mask) {
+		createLight(name, pos.x, pos.y, type, dist, ang, coneAngle, 0.0f, c, cat, group, mask);
+	}
+
+	/**
+	 * Create a light and add it to the scene.
+	 * 
+	 * @param name
+	 *            The name of the light.
 	 * @param x
 	 *            X position of the light.
 	 * @param y
@@ -741,6 +770,30 @@ public class MScene2D extends Stage {
 	 * 
 	 * @param name
 	 *            The name of the light.
+	 * @param pos
+	 *            The position of the light.
+	 * @param type
+	 *            The light's type (POINT | SPOT | DIRECTIONAL).
+	 * @param dist
+	 *            Light radius/distance.
+	 * @param ang
+	 *            Facing angle of the light.
+	 * @param coneAngle
+	 *            Cone angle of the light.
+	 * @param softness
+	 *            Softness of the light.
+	 * @param c
+	 *            The light's color.
+	 */
+	public void createLight(String name, Vector2 pos, LightType type, float dist, float ang, float coneAngle, Color c) {
+		createLight(name, pos.x, pos.y, type, dist, ang, coneAngle, c, 0, 0, 0);
+	}
+
+	/**
+	 * Create a light and add it to the scene.
+	 * 
+	 * @param name
+	 *            The name of the light.
 	 * @param x
 	 *            X position of the light.
 	 * @param y
@@ -761,6 +814,31 @@ public class MScene2D extends Stage {
 	public void createLight(String name, float x, float y, LightType type, float dist, float ang, float coneAngle,
 			float softness, Color c) {
 		createLight(name, x, y, type, dist, ang, coneAngle, 0.0f, c, 0, 0, 0);
+	}
+
+	/**
+	 * Create a light and add it to the scene.
+	 * 
+	 * @param name
+	 *            The name of the light.
+	 * @param pos
+	 *            The position of the light.
+	 * @param type
+	 *            The light's type (POINT | SPOT | DIRECTIONAL).
+	 * @param dist
+	 *            Light radius/distance.
+	 * @param ang
+	 *            Facing angle of the light.
+	 * @param coneAngle
+	 *            Cone angle of the light.
+	 * @param softness
+	 *            Softness of the light.
+	 * @param c
+	 *            The light's color.
+	 */
+	public void createLight(String name, Vector2 pos, LightType type, float dist, float ang, float coneAngle,
+			float softness, Color c) {
+		createLight(name, pos.x, pos.y, type, dist, ang, coneAngle, 0.0f, c, 0, 0, 0);
 	}
 
 	/**
