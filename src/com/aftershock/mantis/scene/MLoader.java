@@ -174,65 +174,19 @@ public class MLoader {
 		for (int i = 0; i < maps.getLength(); i++) {
 			String mapSrc = ((Element) maps.item(i)).getElementsByTagName("src").item(0).getAttributes()
 					.getNamedItem("value").getNodeValue();
-			int smallestW = Integer.parseInt(((Element) maps.item(i)).getElementsByTagName("smallestSize").item(0)
-					.getAttributes().getNamedItem("width").getNodeValue());
-			int smallestH = Integer.parseInt(((Element) maps.item(i)).getElementsByTagName("smallestSize").item(0)
-					.getAttributes().getNamedItem("height").getNodeValue());
-			int sensorValNum = ((Element) ((Element) maps.item(i)).getElementsByTagName("sensors").item(0))
-					.getElementsByTagName("v").getLength();
-			int catValNum = ((Element) ((Element) maps.item(i)).getElementsByTagName("categories").item(0))
-					.getElementsByTagName("v").getLength();
-			int groupValNum = ((Element) ((Element) maps.item(i)).getElementsByTagName("groups").item(0))
-					.getElementsByTagName("v").getLength();
-			int maskValNum = ((Element) ((Element) maps.item(i)).getElementsByTagName("masks").item(0))
-					.getElementsByTagName("v").getLength();
-			int prefixValNum = ((Element) ((Element) maps.item(i)).getElementsByTagName("prefixes").item(0))
-					.getElementsByTagName("v").getLength();
 			float mapScale = Float.parseFloat(((Element) maps.item(i)).getElementsByTagName("scale").item(0)
 					.getAttributes().getNamedItem("value").getNodeValue());
 			boolean isometric = false;
-			if (((Element) maps.item(i)).getElementsByTagName("scale").item(0)
-					.getAttributes().getLength() > 0) {
+			if (((Element) maps.item(i)).getElementsByTagName("scale").item(0).getAttributes().getLength() > 0) {
 				isometric = Boolean.parseBoolean(((Element) maps.item(i)).getElementsByTagName("scale").item(0)
-					.getAttributes().getNamedItem("isometric").getNodeValue());
+						.getAttributes().getNamedItem("isometric").getNodeValue());
 			}
-			boolean[] sensorVals = new boolean[sensorValNum];
-			String[] prefixVals = new String[prefixValNum];
-			int[] catVals = new int[catValNum];
-			int[] groupVals = new int[groupValNum];
-			int[] maskVals = new int[maskValNum];
 			float padding = 0.0f;
 			if (((Element) maps.item(i)).getElementsByTagName("padding").getLength() > 0) {
 				padding = Float.parseFloat(((Element) maps.item(i)).getElementsByTagName("padding").item(0)
 						.getAttributes().getNamedItem("value").getNodeValue());
 			}
-			for (int n = 0; n < sensorVals.length; n++) {
-				sensorVals[n] = Boolean
-						.parseBoolean(((Element) ((Element) maps.item(i)).getElementsByTagName("sensors").item(0))
-								.getElementsByTagName("v").item(n).getAttributes().getNamedItem("value")
-								.getNodeValue());
-			}
-			for (int n = 0; n < catVals.length; n++) {
-				String val = ((Element) ((Element) maps.item(i)).getElementsByTagName("categories").item(0))
-						.getElementsByTagName("v").item(n).getAttributes().getNamedItem("value").getNodeValue();
-				catVals[n] = (short) Integer.parseInt(val);
-			}
-			for (int n = 0; n < groupVals.length; n++) {
-				String val = ((Element) ((Element) maps.item(i)).getElementsByTagName("groups").item(0))
-						.getElementsByTagName("v").item(n).getAttributes().getNamedItem("value").getNodeValue();
-				groupVals[n] = (short) Integer.parseInt(val);
-			}
-			for (int n = 0; n < maskVals.length; n++) {
-				String val = ((Element) ((Element) maps.item(i)).getElementsByTagName("masks").item(0))
-						.getElementsByTagName("v").item(n).getAttributes().getNamedItem("value").getNodeValue();
-				maskVals[n] = (short) Integer.parseInt(val);
-			}
-			for (int n = 0; n < prefixVals.length; n++) {
-				prefixVals[n] = ((Element) ((Element) maps.item(i)).getElementsByTagName("prefixes").item(0))
-						.getElementsByTagName("v").item(n).getAttributes().getNamedItem("value").getNodeValue();
-			}
-			MapLoader.loadMap(scene, mapSrc, prefixVals, sensorVals, catVals, groupVals, maskVals, smallestW, smallestH,
-					mapScale, padding, isometric);
+			MapLoader.loadMap(scene, mapSrc, mapScale, padding, isometric);
 		}
 
 		// Parse entities

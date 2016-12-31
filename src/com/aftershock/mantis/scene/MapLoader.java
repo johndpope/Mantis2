@@ -27,7 +27,7 @@ import static com.aftershock.mantis.scene.util.MUtil.*;
 public class MapLoader {
 	static TmxMapLoader tMapLoader = new TmxMapLoader();
 
-	private static void _processMap(MScene2D s, TiledMapTile[][][] mapData, int smallestW, int smallestH, float scale,
+	private static void _processMap(MScene2D s, TiledMapTile[][][] mapData, float smallestW, float smallestH, float scale,
 			float padding, String[] prefixes, boolean[] sensors, int[] cats, int[] groups, int[] masks,
 			boolean isometric) {
 
@@ -35,7 +35,6 @@ public class MapLoader {
 		int i = 0;
 		if (isometric) {
 			for (int z = 0; z < mapData.length; z++) { // LAYER/DEPTH
-
 				for (int x = 0; x < w; x++) { // X POSITION (BL -> TR)
 					for (int y = 0; y < h; y++) { // Y POSITION (TR -> BR)
 
@@ -107,43 +106,48 @@ public class MapLoader {
 	 *            Scene on which to load the map.
 	 * @param map
 	 *            Map file to load (.tmx).
-	 * @param prefixes
-	 *            Layer prefixes.
-	 * @param sensors
-	 *            Layer sensor states.
-	 * @param cats
-	 *            Category bits.
-	 * @param groups
-	 *            Group bits.
-	 * @param masks
-	 *            Mask bits.
-	 * @param smallestW
-	 *            Base width.
-	 * @param smallestH
-	 *            Base height.
 	 * @param scale
 	 *            Map scale.
 	 * @param padding
 	 *            Size Padding
 	 */
-	public static Vector2 loadMap(MScene2D s, String map, String[] prefixes, boolean[] sensors, int[] cats,
-			int[] groups, int[] masks, int smallestW, int smallestH, float scale, float padding, boolean isometric) {
+	public static Vector2 loadMap(MScene2D s, String map, float scale, float padding, boolean isometric) {
 
 		TiledMap tMap = tMapLoader.load("assets/maps/" + map);
 		TiledMapTileLayer firstLayer = (TiledMapTileLayer) tMap.getLayers().get(0);
 		int w = firstLayer.getWidth();
 		int h = firstLayer.getHeight();
-
-		TiledMapTile[][][] layers = new TiledMapTile[tMap.getLayers().getCount()][w][h];
-
-		for (int layerNum = 0; layerNum < tMap.getLayers().getCount(); layerNum++) {
-
-			TiledMapTileLayer layer = (TiledMapTileLayer) tMap.getLayers().get(layerNum);
+		int lCount = tMap.getLayers().getCount();
+		
+		TiledMapTile[][][] layers = new TiledMapTile[lCount][w][h];
+		String[] prefixes = new String[lCount];
+		float smallestW = 0.0f, smallestH = 0.0f;
+		
+		boolean[] sensors = new boolean[lCount];
+		int[] cats = new int[lCount];
+		int[] groups = new int[lCount];
+		int[] masks = new int[lCount];
+		
+		for (int lNum = 0; lNum < lCount; lNum++) {
+			TiledMapTileLayer layer = (TiledMapTileLayer) tMap.getLayers().get(lNum);
+			smallestW = layer.getTileWidth();
+			smallestH = layer.getTileHeight();
+			prefixes[lNum] = layer.getName();
+			if (layer.getProperties().containsKey("cat")) 
+				cats[lNum] = Integer.parseInt((String) layer.getProperties().get("cat"));
+			if (layer.getProperties().containsKey("group"))
+				groups[lNum] = Integer.parseInt((String) layer.getProperties().get("group"));
+			if (layer.getProperties().containsKey("mask"))
+				masks[lNum] = Integer.parseInt((String) layer.getProperties().get("mask"));
+			if (layer.getProperties().containsKey("sensor"))
+				sensors[lNum] = Boolean.parseBoolean((String) layer.getProperties().get("sensor"));
+			
 			for (int x = 0; x < w; x++)
 				for (int y = 0; y < h; y++)
 					if (layer.getCell(x, y) != null)
-						layers[layerNum][x][y] = layer.getCell(x, y).getTile();
+						layers[lNum][x][y] = layer.getCell(x, y).getTile();
 		}
+		
 		_processMap(s, layers, smallestW, smallestH, scale, padding, prefixes, sensors, cats, groups, masks, isometric);
 		return new Vector2(w, h);
 	}
@@ -155,26 +159,11 @@ public class MapLoader {
 	 *            Scene on which to load the map.
 	 * @param map
 	 *            Map file to load (.tmx).
-	 * @param prefixes
-	 *            Layer prefixes.
-	 * @param sensor
-	 *            Layer sensor states.
-	 * @param cats
-	 *            Category bits.
-	 * @param groups
-	 *            Group bits.
-	 * @param masks
-	 *            Mask bits.
-	 * @param smallestW
-	 *            Base width.
-	 * @param smallestH
-	 *            Base height.
 	 * @param scale
 	 *            Map scale.
 	 */
-	public static Vector2 loadMap(MScene2D s, String map, String[] prefixes, boolean[] sensor, int[] cats, int[] groups,
-			int[] masks, int smallestW, int smallestH, float scale, boolean isometric) {
-		return loadMap(s, map, prefixes, sensor, cats, groups, masks, smallestW, smallestH, scale, 0.0f, isometric);
+	public static Vector2 loadMap(MScene2D s, String map, float scale, boolean isometric) {
+		return loadMap(s, map, scale, 0.0f, isometric);
 	}
 
 }
