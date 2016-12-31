@@ -250,6 +250,16 @@ public class MObjectRef {
 	}
 
 	/**
+	 * Sets the rotation offset of the referred object.
+	 * 
+	 * @param offset
+	 *            The new offset.
+	 */
+	public void setRotOffset(float offset) {
+		_owningScene.setGObjectRotOffset(_name, offset);
+	}
+
+	/**
 	 * Returns if the referred MGameObject exists.
 	 * 
 	 * @return Whether or not the referred object is present in the scene.
@@ -299,6 +309,15 @@ public class MObjectRef {
 	 */
 	public boolean getFlipY() {
 		return _owningScene.getGObjectFlippedY(_name);
+	}
+
+	/**
+	 * Gets the referred object's rotation offset.
+	 * 
+	 * @return The rotation offset of the referred object.
+	 */
+	public float getRotOffset() {
+		return _owningScene.getGObjectRotOffset(_name);
 	}
 
 	/**

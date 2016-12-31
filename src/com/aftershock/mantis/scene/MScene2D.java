@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -76,7 +77,10 @@ public class MScene2D extends Stage {
 	private LinkedHashMap<String, MPhysHook> _physHooks = new LinkedHashMap<String, MPhysHook>();
 	private float _timeScale = 1.0f;
 	private float _volume = 1.0f, _pitch = 1.0f, _pan = 1.0f;
+	private int _objectcnt = 0;
 	public ShaderProgram shader;
+	
+	Box2DDebugRenderer b2dr = new Box2DDebugRenderer();
 
 	// Do-Later Queue
 	LinkedList<MCallback> dlq = new LinkedList<MCallback>();
@@ -356,48 +360,6 @@ public class MScene2D extends Stage {
 	 * @param initialSize
 	 *            Initial size of the object.
 	 * @param texture
-	 *            Texture of the object.
-	 * @param circle
-	 *            Whether or not to treat the object as a circle.
-	 * @param rotate
-	 *            Does physics object rotate.
-	 * @param cat
-	 *            Category bit.
-	 * @param group
-	 *            Group bit.
-	 * @param mask
-	 *            Mask bit.
-	 */
-	public void createGObject(String name, BodyType type, Vector2 initialPos, Vector2 initialSize, String texture,
-			boolean circle, boolean rotate, int cat, int group, int mask) {
-		doLater(() -> {
-			MGameObject newObject = null;
-
-			if (_texCache.containsKey(texture)) {
-				newObject = new MGameObject(_world, name, type, initialPos, initialSize, _texCache.get(texture), circle,
-						rotate, cat, group, mask);
-			} else {
-				_texCache.put(texture, new Texture(Gdx.files.internal("assets/textures/" + texture)));
-				newObject = new MGameObject(_world, name, type, initialPos, initialSize, _texCache.get(texture), circle,
-						rotate, cat, group, mask);
-			}
-			_objects.put(name, newObject);
-			this.addActor(newObject);
-		});
-	}
-
-	/**
-	 * Creates a game object.
-	 * 
-	 * @param name
-	 *            The name of the object.
-	 * @param type
-	 *            Object physics type.
-	 * @param initialPos
-	 *            Initial position of the object.
-	 * @param initialSize
-	 *            Initial size of the object.
-	 * @param texture
 	 *            Texture region of the object.
 	 * @param circle
 	 *            Whether or not to treat the object as a circle.
@@ -420,6 +382,7 @@ public class MScene2D extends Stage {
 
 			_objects.put(name, newObject);
 			this.addActor(newObject);
+			_objectcnt++;
 		});
 	}
 
@@ -435,58 +398,55 @@ public class MScene2D extends Stage {
 	 * @param initialSize
 	 *            Initial size of the object.
 	 * @param texture
-	 *            Texture of the object.
+	 *            The texture name of the object.
 	 * @param circle
 	 *            Whether or not to treat the object as a circle.
 	 * @param rotate
 	 *            Does physics object rotate.
+	 * @param cat
+	 *            Category bit.
+	 * @param group
+	 *            Group bit.
+	 * @param mask
+	 *            Mask bit.
 	 */
 	public void createGObject(String name, BodyType type, Vector2 initialPos, Vector2 initialSize, String texture,
-			boolean circle, boolean rotate) {
+			boolean circle, boolean rotate, int cat, int group, int mask) {
 		doLater(() -> {
 			MGameObject newObject = null;
 
-			if (_texCache.containsKey(texture)) {
-				newObject = new MGameObject(_world, name, type, initialPos, initialSize, _texCache.get(texture), circle,
-						rotate);
-			} else {
-				_texCache.put(texture, new Texture(Gdx.files.internal("assets/textures/" + texture)));
-				newObject = new MGameObject(_world, name, type, initialPos, initialSize, _texCache.get(texture), circle,
-						rotate);
-			}
+			newObject = new MGameObject(_world, name, type, initialPos, initialSize, texture, circle, rotate, cat,
+					group, mask);
+
 			_objects.put(name, newObject);
 			this.addActor(newObject);
+			_objectcnt++;
 		});
 	}
 
 	/**
-	 * Creates a game object.
+	 * Sets the rotation offset of a given object.
 	 * 
 	 * @param name
-	 *            The name of the object.
-	 * @param type
-	 *            Object physics type.
-	 * @param initialPos
-	 *            Initial position of the object.
-	 * @param initialSize
-	 *            Initial size of the object.
-	 * @param texture
-	 *            Texture region of the object.
-	 * @param circle
-	 *            Whether or not to treat the object as a circle.
-	 * @param rotate
-	 *            Does physics object rotate.
+	 *            The name of the object to modify.
+	 * @param rotOffset
+	 *            The new rotation offset.
 	 */
-	public void createGObject(String name, BodyType type, Vector2 initialPos, Vector2 initialSize,
-			TextureRegion texture, boolean circle, boolean rotate) {
+	public void setGObjectRotOffset(String name, float rotOffset) {
 		doLater(() -> {
-			MGameObject newObject = null;
-
-			newObject = new MGameObject(_world, name, type, initialPos, initialSize, texture, circle, rotate);
-
-			_objects.put(name, newObject);
-			this.addActor(newObject);
+			_objects.get(name).setSpriteRotOffset(rotOffset);
 		});
+	}
+
+	/**
+	 * Gets the rotation offset of a given object.
+	 * 
+	 * @param name
+	 *            The name of the object to poll.
+	 * @return The given object's rotation offset.
+	 */
+	public float getGObjectRotOffset(String name) {
+		return _objects.get(name).getSpriteRotOffset();
 	}
 
 	/**
@@ -755,8 +715,6 @@ public class MScene2D extends Stage {
 	 *            Facing angle of the light.
 	 * @param coneAngle
 	 *            Cone angle of the light.
-	 * @param softness
-	 *            Softness of the light.
 	 * @param c
 	 *            The light's color.
 	 */
@@ -780,8 +738,6 @@ public class MScene2D extends Stage {
 	 *            Facing angle of the light.
 	 * @param coneAngle
 	 *            Cone angle of the light.
-	 * @param softness
-	 *            Softness of the light.
 	 * @param c
 	 *            The light's color.
 	 */
@@ -813,7 +769,7 @@ public class MScene2D extends Stage {
 	 */
 	public void createLight(String name, float x, float y, LightType type, float dist, float ang, float coneAngle,
 			float softness, Color c) {
-		createLight(name, x, y, type, dist, ang, coneAngle, 0.0f, c, 0, 0, 0);
+		createLight(name, x, y, type, dist, ang, coneAngle, softness, c, 0, 0, 0);
 	}
 
 	/**
@@ -839,6 +795,37 @@ public class MScene2D extends Stage {
 	public void createLight(String name, Vector2 pos, LightType type, float dist, float ang, float coneAngle,
 			float softness, Color c) {
 		createLight(name, pos.x, pos.y, type, dist, ang, coneAngle, 0.0f, c, 0, 0, 0);
+	}
+
+	/**
+	 * Create a light and add it to the scene.
+	 * 
+	 * @param name
+	 *            The name of the light.
+	 * @param pos
+	 *            The position of the light.
+	 * @param type
+	 *            The light's type (POINT | SPOT | DIRECTIONAL).
+	 * @param dist
+	 *            Light radius/distance.
+	 * @param ang
+	 *            Facing angle of the light.
+	 * @param coneAngle
+	 *            Cone angle of the light.
+	 * @param softness
+	 *            Softness of the light.
+	 * @param c
+	 *            The light's color.
+	 * @param cat
+	 *            Category bit.
+	 * @param group
+	 *            Group bit.
+	 * @param mask
+	 *            Mask bit.
+	 */
+	public void createLight(String name, Vector2 pos, LightType type, float dist, float ang, float coneAngle,
+			float softness, Color c, int cat, int group, int mask) {
+		createLight(name, pos.x, pos.y, type, dist, ang, coneAngle, softness, c, cat, group, mask);
 	}
 
 	/**
@@ -894,7 +881,7 @@ public class MScene2D extends Stage {
 			case DIRECTIONAL:
 				DirectionalLight dirLight = new DirectionalLight(handler, lightRays, c, ang);
 				dirLight.setContactFilter((short) cat, (short) group, (short) mask);
-				dirLight.setSoftnessLength(0);
+				dirLight.setSoftnessLength(softness);
 				_lights.put(name, dirLight);
 				_lightangles.put(name, new Vector2(ang, 0.0f));
 				break;
@@ -1283,8 +1270,7 @@ public class MScene2D extends Stage {
 	public void setGObjectRot(String name, float angle) {
 		doLater(() -> {
 			if (_objects.get(name) != null) {
-				_objects.get(name).body.setTransform(_objects.get(name).body.getPosition().x,
-						_objects.get(name).body.getPosition().y, (float) Math.toRadians(angle));
+				_objects.get(name).body.setTransform(_objects.get(name).body.getWorldCenter(), (float) Math.toRadians(angle));
 				_objects.get(name).setRotation(angle);
 			}
 		});
@@ -1394,8 +1380,18 @@ public class MScene2D extends Stage {
 			while (_objects.containsKey(name)) {
 				_objects.get(name).remove();
 				_objects.remove(name);
+				_objectcnt--;
 			}
 		});
+	}
+
+	/**
+	 * Gets the current number of objects in the scene.
+	 * 
+	 * @return The number of objects in the scene.
+	 */
+	public int getObjectCount() {
+		return _objectcnt;
 	}
 
 	/**
@@ -1767,6 +1763,8 @@ public class MScene2D extends Stage {
 
 		handler.setCombinedMatrix(this.getCamera().combined, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		handler.render();
+		
+		//b2dr.render(_world, this.getCamera().projection);
 	}
 
 	/**
@@ -2000,6 +1998,8 @@ public class MScene2D extends Stage {
 	@Override
 	public void dispose() {
 		super.dispose();
+		
+		b2dr.dispose();
 		_world.dispose();
 		for (MParticleSystem sys : _particleSystems.values())
 			sys.dispose();

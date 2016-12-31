@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.aftershock.mantis.scene.MAnimationManager;
 import com.aftershock.mantis.scene.MScene2D;
+import com.aftershock.mantis.scene.MUIPane;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -28,6 +29,7 @@ public class Mantis extends ApplicationAdapter {
 
 	public static Game currentgame;
 	private static ArrayList<MScene2D> _scenes = new ArrayList<MScene2D>();
+	private static ArrayList<MUIPane> _panes = new ArrayList<MUIPane>();
 	private static long _delta, _now = 0, _last = 0;
 
 	public Mantis(Game game) {
@@ -73,6 +75,16 @@ public class Mantis extends ApplicationAdapter {
 	}
 
 	/**
+	 * Adds a UI pane to the engine.
+	 * 
+	 * @param pane
+	 *            The pane to be added.
+	 */
+	public static void addPane(MUIPane pane) {
+		_panes.add(pane);
+	}
+
+	/**
 	 * Sets the current game.
 	 * 
 	 * @param g
@@ -99,6 +111,9 @@ public class Mantis extends ApplicationAdapter {
 	public void dispose() {
 		for (MScene2D s : _scenes) {
 			s.dispose();
+		}
+		for (MUIPane p : _panes) {
+			p.dispose();
 		}
 	}
 

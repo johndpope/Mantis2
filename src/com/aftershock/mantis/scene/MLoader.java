@@ -190,11 +190,17 @@ public class MLoader {
 					.getElementsByTagName("v").getLength();
 			float mapScale = Float.parseFloat(((Element) maps.item(i)).getElementsByTagName("scale").item(0)
 					.getAttributes().getNamedItem("value").getNodeValue());
+			boolean isometric = false;
+			if (((Element) maps.item(i)).getElementsByTagName("scale").item(0)
+					.getAttributes().getLength() > 0) {
+				isometric = Boolean.parseBoolean(((Element) maps.item(i)).getElementsByTagName("scale").item(0)
+					.getAttributes().getNamedItem("isometric").getNodeValue());
+			}
 			boolean[] sensorVals = new boolean[sensorValNum];
 			String[] prefixVals = new String[prefixValNum];
-			short[] catVals = new short[catValNum];
-			short[] groupVals = new short[groupValNum];
-			short[] maskVals = new short[maskValNum];
+			int[] catVals = new int[catValNum];
+			int[] groupVals = new int[groupValNum];
+			int[] maskVals = new int[maskValNum];
 			float padding = 0.0f;
 			if (((Element) maps.item(i)).getElementsByTagName("padding").getLength() > 0) {
 				padding = Float.parseFloat(((Element) maps.item(i)).getElementsByTagName("padding").item(0)
@@ -226,7 +232,7 @@ public class MLoader {
 						.getElementsByTagName("v").item(n).getAttributes().getNamedItem("value").getNodeValue();
 			}
 			MapLoader.loadMap(scene, mapSrc, prefixVals, sensorVals, catVals, groupVals, maskVals, smallestW, smallestH,
-					mapScale, padding);
+					mapScale, padding, isometric);
 		}
 
 		// Parse entities

@@ -40,6 +40,7 @@ public class MGameObject extends Actor {
 	volatile Sprite drawSprite;
 	boolean flipX = false, flipY = false;
 	float opacity = 1.0f;
+	float rotOffset = 0.0f;
 
 	/**
 	 * Creates a game object.
@@ -68,7 +69,7 @@ public class MGameObject extends Actor {
 	 *            Mask bit.
 	 */
 	public MGameObject(World world, String name, BodyType type, Vector2 initialPos, Vector2 initialSize,
-			Texture texture, boolean circular, boolean rotate, int cat, int group, int mask) {
+			TextureRegion texture, boolean circular, boolean rotate, int cat, int group, int mask) {
 		FixtureDef fDef = new FixtureDef();
 		fDef.density = 1f;
 		fDef.friction = 0.5f;
@@ -113,6 +114,8 @@ public class MGameObject extends Actor {
 	}
 
 	/**
+	 * Creates a game object.
+	 * 
 	 * @param world
 	 *            World to use for physics.
 	 * @param name
@@ -124,7 +127,7 @@ public class MGameObject extends Actor {
 	 * @param initialSize
 	 *            Initial size of the object.
 	 * @param texture
-	 *            The object's texture.
+	 *            The name of the object's texture.
 	 * @param circular
 	 *            Whether or not to treat this object as a circle.
 	 * @param rotate
@@ -136,55 +139,10 @@ public class MGameObject extends Actor {
 	 * @param mask
 	 *            Mask bit.
 	 */
-	public MGameObject(World world, String name, BodyType type, Vector2 initialPos, Vector2 initialSize,
-			TextureRegion texture, boolean circular, boolean rotate, int cat, int group, int mask) {
-		this(world, name, type, initialPos, initialSize, texture.getTexture(), circular, rotate, cat, group, mask);
-	}
-
-	/**
-	 * @param world
-	 *            World to use for physics.
-	 * @param name
-	 *            Name of the object.
-	 * @param type
-	 *            Physical type of the object.
-	 * @param initialPos
-	 *            Initial position of the object.
-	 * @param initialSize
-	 *            Initial size of the object.
-	 * @param texture
-	 *            The object's texture.
-	 * @param circular
-	 *            Whether or not to treat this object as a circle.
-	 * @param rotate
-	 *            Whether or not this object can rotate.
-	 */
-	public MGameObject(World world, String name, BodyType type, Vector2 initialPos, Vector2 initialSize,
-			TextureRegion texture, boolean circular, boolean rotate) {
-		this(world, name, type, initialPos, initialSize, texture.getTexture(), circular, rotate, 0, 0, 0);
-	}
-
-	/**
-	 * @param world
-	 *            World to use for physics.
-	 * @param name
-	 *            Name of the object.
-	 * @param type
-	 *            Physical type of the object.
-	 * @param initialPos
-	 *            Initial position of the object.
-	 * @param initialSize
-	 *            Initial size of the object.
-	 * @param texture
-	 *            The object's texture.
-	 * @param circular
-	 *            Whether or not to treat this object as a circle.
-	 * @param rotate
-	 *            Whether or not this object can rotate.
-	 */
-	public MGameObject(World world, String name, BodyType type, Vector2 initialPos, Vector2 initialSize,
-			Texture texture, boolean circular, boolean rotate) {
-		this(world, name, type, initialPos, initialSize, texture, circular, rotate, 0, 0, 0);
+	public MGameObject(World world, String name, BodyType type, Vector2 initialPos, Vector2 initialSize, String texture,
+			boolean circular, boolean rotate, int cat, int group, int mask) {
+		this(world, name, type, initialPos, initialSize, new TextureRegion(new Texture(texture)), circular, rotate, cat,
+				group, mask);
 	}
 
 	@Override
@@ -192,7 +150,7 @@ public class MGameObject extends Actor {
 		drawSprite.setPosition(this.getX(), this.getY());
 		drawSprite.setOrigin(drawSprite.getWidth() / 2.0f, drawSprite.getHeight() / 2.0f);
 		drawSprite.setFlip(flipX, flipY);
-		drawSprite.setScale(2f);
+		drawSprite.setScale(2.0f);
 		drawSprite.setRotation(this.getRotation());
 		drawSprite.setAlpha(opacity);
 		drawSprite.draw(batch);
@@ -204,7 +162,7 @@ public class MGameObject extends Actor {
 	 * @param reg
 	 *            New TextureRegion to use.
 	 */
-	public synchronized void setTex(TextureRegion reg) {
+	public void setTex(TextureRegion reg) {
 		tex = reg;
 		Vector2 oldSize = new Vector2(drawSprite.getWidth(), drawSprite.getHeight());
 		drawSprite = new Sprite(tex);
@@ -212,13 +170,34 @@ public class MGameObject extends Actor {
 	}
 
 	/**
+	 * Sets the rotation offset of this object.
+	 * 
+	 * @param rot
+	 *            The new sprite rotation offset.
+	 */
+	public void setSpriteRotOffset(float rot) {
+		rotOffset = rot;
+	}
+
+	/**
+	 * Gets the rotation offset of this object.
+	 * 
+	 * @return The sprite rotation offset.
+	 */
+	public float getSpriteRotOffset() {
+		return rotOffset;
+	}
+
+	/**
 	 * Update this object.
 	 */
 	public void update() {
-		this.setPosition(body.getPosition().x - drawSprite.getWidth() / 2.0f,
-				body.getPosition().y - drawSprite.getHeight() / 2.0f);
+		this.setPosition(
+				body.getPosition().x - (drawSprite.getWidth() / 2.0f),
+				body.getPosition().y - (drawSprite.getHeight() / 2.0f)
+				);
 
-		this.setRotation((float) Math.toDegrees(body.getAngle()));
+		this.setRotation((float) Math.toDegrees(body.getAngle()) + rotOffset);
 	}
 
 }

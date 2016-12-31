@@ -3,11 +3,11 @@ package com.aftershock.mantis.scene;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
+import static com.aftershock.mantis.scene.util.MUtil.*;
 /*
  * Copyright 2016 Luke Diamond
  * 
@@ -27,6 +27,79 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 public class MapLoader {
 	static TmxMapLoader tMapLoader = new TmxMapLoader();
 
+	private static void _processMap(MScene2D s, TiledMapTile[][][] mapData, int smallestW, int smallestH, float scale,
+			float padding, String[] prefixes, boolean[] sensors, int[] cats, int[] groups, int[] masks,
+			boolean isometric) {
+
+		int w = mapData[0].length, h = mapData[0][0].length;
+		int i = 0;
+		if (isometric) {
+			for (int z = 0; z < mapData.length; z++) { // LAYER/DEPTH
+
+				for (int x = 0; x < w; x++) { // X POSITION (BL -> TR)
+					for (int y = 0; y < h; y++) { // Y POSITION (TR -> BR)
+
+						TiledMapTile tile = mapData[z][x][(h - 1) - y];
+						if (tile == null)
+							continue;
+
+						String name = prefixes[z] + i++;
+
+						// Tile Sizes
+						float tileW = tile.getTextureRegion().getRegionWidth();
+						float tileH = tile.getTextureRegion().getRegionHeight();
+
+						// Tile Offsets
+						float SOX = (tileW * 2.0f * (smallestW / tileW));
+						float SOY = (tileH * 2.0f * (smallestH / tileW));
+
+						// Tile Positions
+						float xPos = x - y;
+						float yPos = h - (x + y);
+
+						// Populate Scene
+						s.createGObject(name, BodyType.StaticBody, vec((xPos * SOX) / 2, (yPos * SOY) / 2).scl(scale),
+								vec(tileW + padding, tileH + padding).scl(scale), tile.getTextureRegion(), false, false,
+								cats[z], groups[z], masks[z]);
+						s.setGObjectRot(name, 30);
+						s.setGObjectRotOffset(name, -30);
+
+					}
+				}
+
+			}
+
+		} else {
+
+			for (int z = 0; z < mapData.length; z++) { // LAYER/DEPTH
+
+				for (int x = 0; x < w; x++) { // X POSITION (BL -> TR)
+					for (int y = 0; y < h; y++) { // Y POSITION (TR -> BR)
+
+						TiledMapTile tile = mapData[z][x][y];
+						if (tile == null)
+							continue;
+
+						String name = prefixes[z] + i++;
+
+						// Tile Sizes
+						float tileW = tile.getTextureRegion().getRegionWidth() / 2.0f;
+						float tileH = tile.getTextureRegion().getRegionHeight() / 2.0f;
+
+						// Tile Offsets
+						float SOX = ((x * tileW * 2.0f * (smallestW / tileW)) + tileW);
+						float SOY = ((y * tileH * 2.0f * (smallestH / tileH)) + tileH);
+
+						// Populate Scene
+						s.createGObject(name, BodyType.StaticBody, new Vector2(SOX, SOY).scl(scale),
+								new Vector2(tileW * scale, tileH * scale).add(padding, padding),
+								tile.getTextureRegion(), false, false, cats[z], groups[z], masks[z]);
+					}
+				}
+			}
+		}
+	}
+
 	/**
 	 * Loads map onto scene.
 	 * 
@@ -36,7 +109,7 @@ public class MapLoader {
 	 *            Map file to load (.tmx).
 	 * @param prefixes
 	 *            Layer prefixes.
-	 * @param sensor
+	 * @param sensors
 	 *            Layer sensor states.
 	 * @param cats
 	 *            Category bits.
@@ -53,42 +126,25 @@ public class MapLoader {
 	 * @param padding
 	 *            Size Padding
 	 */
-	public static Vector2 loadMap(MScene2D s, String map, String[] prefixes, boolean[] sensor, short[] cats,
-			short[] groups, short[] masks, int smallestW, int smallestH, float scale, float padding) {
+	public static Vector2 loadMap(MScene2D s, String map, String[] prefixes, boolean[] sensors, int[] cats,
+			int[] groups, int[] masks, int smallestW, int smallestH, float scale, float padding, boolean isometric) {
+
 		TiledMap tMap = tMapLoader.load("assets/maps/" + map);
-		int i = 0;
-		float w = 0.0f, h = 0.0f;
+		TiledMapTileLayer firstLayer = (TiledMapTileLayer) tMap.getLayers().get(0);
+		int w = firstLayer.getWidth();
+		int h = firstLayer.getHeight();
+
+		TiledMapTile[][][] layers = new TiledMapTile[tMap.getLayers().getCount()][w][h];
 
 		for (int layerNum = 0; layerNum < tMap.getLayers().getCount(); layerNum++) {
+
 			TiledMapTileLayer layer = (TiledMapTileLayer) tMap.getLayers().get(layerNum);
-			w = layer.getWidth();
-			h = layer.getWidth();
-			for (int x = 0; x < layer.getWidth(); x++)
-				for (int y = 0; y < layer.getHeight(); y++) {
-					if (layer.getCell(x, y) != null) {
-
-						Cell c = layer.getCell(x, y);
-
-						TiledMapTile tile = c.getTile();
-
-						float tileW = tile.getTextureRegion().getRegionWidth();
-						float tileH = tile.getTextureRegion().getRegionHeight();
-						s.createGObject(prefixes[layerNum] + i, BodyType.StaticBody,
-
-								new Vector2(((x * tileW * 2.0f * (smallestW / tileW)) + tileW) * scale,
-										((y * tileH * 2.0f * (smallestH / tileH)) + tileH) * scale),
-
-								new Vector2(tileW * scale, tileH * scale).add(padding, padding),
-
-								tile.getTextureRegion(), false, false, cats[layerNum], groups[layerNum],
-								masks[layerNum]);
-						s.setSensor(prefixes[layerNum] + i, sensor[layerNum]);
-						i++;
-					}
-
-				}
-			i = 0;
+			for (int x = 0; x < w; x++)
+				for (int y = 0; y < h; y++)
+					if (layer.getCell(x, y) != null)
+						layers[layerNum][x][y] = layer.getCell(x, y).getTile();
 		}
+		_processMap(s, layers, smallestW, smallestH, scale, padding, prefixes, sensors, cats, groups, masks, isometric);
 		return new Vector2(w, h);
 	}
 
@@ -116,9 +172,9 @@ public class MapLoader {
 	 * @param scale
 	 *            Map scale.
 	 */
-	public static Vector2 loadMap(MScene2D s, String map, String[] prefixes, boolean[] sensor, short[] cats,
-			short[] groups, short[] masks, int smallestW, int smallestH, float scale) {
-		return loadMap(s, map, prefixes, sensor, cats, groups, masks, smallestW, smallestH, scale, 0.0f);
+	public static Vector2 loadMap(MScene2D s, String map, String[] prefixes, boolean[] sensor, int[] cats, int[] groups,
+			int[] masks, int smallestW, int smallestH, float scale, boolean isometric) {
+		return loadMap(s, map, prefixes, sensor, cats, groups, masks, smallestW, smallestH, scale, 0.0f, isometric);
 	}
 
 }
