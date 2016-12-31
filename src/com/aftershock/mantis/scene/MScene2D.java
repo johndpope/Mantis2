@@ -79,7 +79,7 @@ public class MScene2D extends Stage {
 	private float _volume = 1.0f, _pitch = 1.0f, _pan = 1.0f;
 	private int _objectcnt = 0;
 	public ShaderProgram shader;
-	
+
 	Box2DDebugRenderer b2dr = new Box2DDebugRenderer();
 
 	// Do-Later Queue
@@ -373,12 +373,12 @@ public class MScene2D extends Stage {
 	 *            Mask bit.
 	 */
 	public void createGObject(String name, BodyType type, Vector2 initialPos, Vector2 initialSize,
-			TextureRegion texture, boolean circle, boolean rotate, int cat, int group, int mask) {
+			TextureRegion texture, boolean circle, boolean rotate, int cat, int group, int mask, boolean physical) {
 		doLater(() -> {
 			MGameObject newObject = null;
 
 			newObject = new MGameObject(_world, name, type, initialPos, initialSize, texture, circle, rotate, (int) cat,
-					(int) group, (int) mask);
+					(int) group, (int) mask, physical);
 
 			_objects.put(name, newObject);
 			this.addActor(newObject);
@@ -411,12 +411,12 @@ public class MScene2D extends Stage {
 	 *            Mask bit.
 	 */
 	public void createGObject(String name, BodyType type, Vector2 initialPos, Vector2 initialSize, String texture,
-			boolean circle, boolean rotate, int cat, int group, int mask) {
+			boolean circle, boolean rotate, int cat, int group, int mask, boolean physical) {
 		doLater(() -> {
 			MGameObject newObject = null;
 
 			newObject = new MGameObject(_world, name, type, initialPos, initialSize, texture, circle, rotate, cat,
-					group, mask);
+					group, mask, physical);
 
 			_objects.put(name, newObject);
 			this.addActor(newObject);
@@ -460,7 +460,7 @@ public class MScene2D extends Stage {
 	public void setGObjectVelocity(String name, Vector2 vel) {
 		doLater(() -> {
 			if (_objects.get(name) != null)
-				_objects.get(name).body.setLinearVelocity(vel);
+				_objects.get(name).getBody().setLinearVelocity(vel);
 		});
 	}
 
@@ -477,7 +477,7 @@ public class MScene2D extends Stage {
 	public void setGObjectVelocity(String name, float x, float y) {
 		doLater(() -> {
 			if (_objects.get(name) != null)
-				_objects.get(name).body.setLinearVelocity(x, y);
+				_objects.get(name).getBody().setLinearVelocity(x, y);
 		});
 	}
 
@@ -492,7 +492,7 @@ public class MScene2D extends Stage {
 	public void setGObjectLinearDampening(String name, float linDamp) {
 		doLater(() -> {
 			if (_objects.get(name) != null)
-				_objects.get(name).body.setLinearDamping(linDamp);
+				_objects.get(name).getBody().setLinearDamping(linDamp);
 		});
 	}
 
@@ -507,7 +507,7 @@ public class MScene2D extends Stage {
 	public void setGObjectFriction(String name, float fric) {
 		doLater(() -> {
 			if (_objects.get(name) != null)
-				_objects.get(name).fixture.setFriction(fric);
+				_objects.get(name).getFixture().setFriction(fric);
 		});
 	}
 
@@ -522,7 +522,7 @@ public class MScene2D extends Stage {
 	public void setGObjectRestitution(String name, float res) {
 		doLater(() -> {
 			if (_objects.get(name) != null)
-				_objects.get(name).fixture.setRestitution(res);
+				_objects.get(name).getFixture().setRestitution(res);
 		});
 	}
 
@@ -534,7 +534,7 @@ public class MScene2D extends Stage {
 	 * @return The given object's restitution.
 	 */
 	public float getGObjectRestitution(String name) {
-		return _objects.get(name).fixture.getRestitution();
+		return _objects.get(name).getFixture().getRestitution();
 	}
 
 	/**
@@ -545,7 +545,7 @@ public class MScene2D extends Stage {
 	 * @return The given object's friction.
 	 */
 	public float getGObjectFriction(String name) {
-		return _objects.get(name).fixture.getFriction();
+		return _objects.get(name).getFixture().getFriction();
 	}
 
 	/**
@@ -556,7 +556,7 @@ public class MScene2D extends Stage {
 	 * @return The given object's linear dampening.
 	 */
 	public float getGObjectLinearDampening(String name) {
-		return _objects.get(name).body.getLinearDamping();
+		return _objects.get(name).getBody().getLinearDamping();
 	}
 
 	/**
@@ -570,7 +570,7 @@ public class MScene2D extends Stage {
 	public void setSensor(String name, boolean sensor) {
 		doLater(() -> {
 			if (_objects.get(name) != null)
-				_objects.get(name).fixture.setSensor(sensor);
+				_objects.get(name).getFixture().setSensor(sensor);
 		});
 	}
 
@@ -582,7 +582,7 @@ public class MScene2D extends Stage {
 	 * @return Whether or not the given object is a sensor.
 	 */
 	public boolean isSensor(String name) {
-		return _objects.get(name).fixture.isSensor();
+		return _objects.get(name).getFixture().isSensor();
 	}
 
 	/**
@@ -619,7 +619,7 @@ public class MScene2D extends Stage {
 	public void setGObjectSpriteSize(String name, float w, float h) {
 		doLater(() -> {
 			if (_objects.get(name) != null)
-				_objects.get(name).drawSprite.setSize(w, h);
+				_objects.get(name).getDrawSprite().setSize(w, h);
 		});
 	}
 
@@ -634,7 +634,7 @@ public class MScene2D extends Stage {
 	public void setGObjectSpriteSize(String name, Vector2 size) {
 		doLater(() -> {
 			if (_objects.get(name) != null)
-				_objects.get(name).drawSprite.setSize(size.x, size.y);
+				_objects.get(name).getDrawSprite().setSize(size.x, size.y);
 		});
 	}
 
@@ -1104,8 +1104,8 @@ public class MScene2D extends Stage {
 		doLater(() -> {
 			MGameObject gObj = _objects.get(name);
 			if (gObj != null)
-				gObj.body.setTransform(gObj.body.getPosition().x + xAmt, gObj.body.getPosition().y + yAmt,
-						gObj.getRotation());
+				gObj.getBody().setTransform(gObj.getBody().getPosition().x + xAmt,
+						gObj.getBody().getPosition().y + yAmt, gObj.getRotation());
 		});
 	}
 
@@ -1121,8 +1121,8 @@ public class MScene2D extends Stage {
 		doLater(() -> {
 			MGameObject gObj = _objects.get(name);
 			if (gObj != null)
-				gObj.body.setTransform(gObj.body.getPosition().x + trans.x, gObj.body.getPosition().y + trans.y,
-						gObj.getRotation());
+				gObj.getBody().setTransform(gObj.getBody().getPosition().x + trans.x,
+						gObj.getBody().getPosition().y + trans.y, gObj.getRotation());
 		});
 	}
 
@@ -1140,7 +1140,7 @@ public class MScene2D extends Stage {
 		doLater(() -> {
 			MGameObject gObj = _objects.get(name);
 			if (gObj != null)
-				gObj.body.applyLinearImpulse(new Vector2(xAmt, yAmt), gObj.body.getLocalCenter(), true);
+				gObj.getBody().applyLinearImpulse(new Vector2(xAmt, yAmt), gObj.getBody().getLocalCenter(), true);
 		});
 	}
 
@@ -1156,7 +1156,7 @@ public class MScene2D extends Stage {
 		doLater(() -> {
 			MGameObject gObj = _objects.get(name);
 			if (gObj != null)
-				gObj.body.applyLinearImpulse(imp, gObj.body.getLocalCenter(), true);
+				gObj.getBody().applyLinearImpulse(imp, gObj.getBody().getLocalCenter(), true);
 		});
 	}
 
@@ -1174,7 +1174,7 @@ public class MScene2D extends Stage {
 		doLater(() -> {
 			MGameObject gObj = _objects.get(name);
 			if (gObj != null)
-				gObj.body.applyForceToCenter(new Vector2(xAmt, yAmt), true);
+				gObj.getBody().applyForceToCenter(new Vector2(xAmt, yAmt), true);
 		});
 	}
 
@@ -1190,7 +1190,7 @@ public class MScene2D extends Stage {
 		doLater(() -> {
 			MGameObject gObj = _objects.get(name);
 			if (gObj != null)
-				gObj.body.applyForceToCenter(force, true);
+				gObj.getBody().applyForceToCenter(force, true);
 		});
 	}
 
@@ -1203,25 +1203,39 @@ public class MScene2D extends Stage {
 	public void stopGObject(String name) {
 		doLater(() -> {
 			if (_objects.get(name) != null) {
-				_objects.get(name).body.setLinearVelocity(0, 0);
-				_objects.get(name).body.setAngularVelocity(0);
+				_objects.get(name).getBody().setLinearVelocity(0, 0);
+				_objects.get(name).getBody().setAngularVelocity(0);
 			}
 		});
 	}
 
 	/**
-	 * Rotates an object about its center.
+	 * Applies torque to an object.
 	 * 
 	 * @param name
-	 *            The name of the object to rotate.
+	 *            The name of the object to apply to torque to.
 	 * @param amt
-	 *            Rotation in degrees.
+	 *            The torque to apply.
 	 */
-	public void rotateGObject(String name, float amt) {
+	public void applyTorque(String name, float amt) {
 		doLater(() -> {
 			MGameObject gObj = _objects.get(name);
 			if (gObj != null)
-				_objects.get(name).body.applyTorque(amt * gObj.body.getMass(), true);
+				_objects.get(name).getBody().applyTorque(amt * gObj.getBody().getMass(), true);
+		});
+	}
+
+	/**
+	 * Rotates an object by a given angle.
+	 * 
+	 * @param name
+	 *            The name of the object to rotate.
+	 * @param angle
+	 *            The rotation in degrees.
+	 */
+	public void rotateGObject(String name, float angle) {
+		doLater(() -> {
+			_objects.get(name).rotate(angle);
 		});
 	}
 
@@ -1238,7 +1252,7 @@ public class MScene2D extends Stage {
 	public void setGObjectPos(String name, float x, float y) {
 		doLater(() -> {
 			if (_objects.get(name) != null)
-				_objects.get(name).body.setTransform(x, y, _objects.get(name).body.getAngle());
+				_objects.get(name).setPos(x, y);
 		});
 	}
 
@@ -1247,16 +1261,11 @@ public class MScene2D extends Stage {
 	 * 
 	 * @param name
 	 *            The name of the object to modify.
-	 * @param x
-	 *            New X position of the object.
-	 * @param y
-	 *            New Y position of the object.
+	 * @param pos
+	 *            The new position.
 	 */
 	public void setGObjectPos(String name, Vector2 pos) {
-		doLater(() -> {
-			if (_objects.get(name) != null)
-				_objects.get(name).body.setTransform(pos, _objects.get(name).body.getAngle());
-		});
+		setGObjectPos(name, pos.x, pos.y);
 	}
 
 	/**
@@ -1270,8 +1279,7 @@ public class MScene2D extends Stage {
 	public void setGObjectRot(String name, float angle) {
 		doLater(() -> {
 			if (_objects.get(name) != null) {
-				_objects.get(name).body.setTransform(_objects.get(name).body.getWorldCenter(), (float) Math.toRadians(angle));
-				_objects.get(name).setRotation(angle);
+				_objects.get(name).setRot(angle);
 			}
 		});
 
@@ -1285,7 +1293,7 @@ public class MScene2D extends Stage {
 	 * @return The position of the object.
 	 */
 	public Vector2 getGObjectPos(String name) {
-		return _objects.get(name).body.getPosition();
+		return _objects.get(name).getBody().getPosition();
 	}
 
 	/**
@@ -1312,8 +1320,7 @@ public class MScene2D extends Stage {
 	public void setGObjectFlip(String name, boolean x, boolean y) {
 		doLater(() -> {
 			if (_objects.get(name) != null) {
-				_objects.get(name).flipX = x;
-				_objects.get(name).flipY = y;
+				_objects.get(name).setFlip(x, y);
 			}
 		});
 	}
@@ -1326,7 +1333,7 @@ public class MScene2D extends Stage {
 	 * @return Whether or not the given object is flipped.
 	 */
 	public boolean getGObjectFlippedX(String name) {
-		return _objects.get(name).flipX;
+		return _objects.get(name).isFlippedX();
 	}
 
 	/**
@@ -1337,7 +1344,7 @@ public class MScene2D extends Stage {
 	 * @return Whether or not the given object is flipped on the Y axis.
 	 */
 	public boolean getGObjectFlippedY(String name) {
-		return _objects.get(name).flipY;
+		return _objects.get(name).isFlippedY();
 	}
 
 	/**
@@ -1376,7 +1383,7 @@ public class MScene2D extends Stage {
 		doLater(() -> {
 			if (_objects.get(name) == null)
 				return;
-			_world.destroyBody(_objects.get(name).body);
+			_world.destroyBody(_objects.get(name).getBody());
 			while (_objects.containsKey(name)) {
 				_objects.get(name).remove();
 				_objects.remove(name);
@@ -1438,7 +1445,7 @@ public class MScene2D extends Stage {
 	public void setGObjectOpacity(String name, float opacity) {
 		doLater(() -> {
 			if (_objects.get(name) != null)
-				_objects.get(name).opacity = opacity;
+				_objects.get(name).setOpacity(opacity);
 		});
 	}
 
@@ -1450,7 +1457,7 @@ public class MScene2D extends Stage {
 	 * @return The object's linear velocity.
 	 */
 	public Vector2 getGObjectVelocity(String name) {
-		return _objects.get(name).body.getLinearVelocity();
+		return _objects.get(name).getBody().getLinearVelocity();
 	}
 
 	/**
@@ -1485,8 +1492,8 @@ public class MScene2D extends Stage {
 
 					WeldJointDef wJntDef = new WeldJointDef();
 					wJntDef.type = type;
-					wJntDef.initialize(wJntDef.bodyA = _objects.get(go0).body, wJntDef.bodyA = _objects.get(go1).body,
-							new Vector2(0, 0));
+					wJntDef.initialize(wJntDef.bodyA = _objects.get(go0).getBody(),
+							wJntDef.bodyA = _objects.get(go1).getBody(), new Vector2(0, 0));
 					wJntDef.collideConnected = true;
 					wJntDef.dampingRatio = 1000f;
 
@@ -1494,8 +1501,8 @@ public class MScene2D extends Stage {
 					break;
 				case DistanceJoint:
 					DistanceJointDef dJntDef = new DistanceJointDef();
-					dJntDef.initialize(_objects.get(go0).body, _objects.get(go1).body,
-							_objects.get(go0).body.getWorldCenter(), _objects.get(go1).body.getWorldCenter());
+					dJntDef.initialize(_objects.get(go0).getBody(), _objects.get(go1).getBody(),
+							_objects.get(go0).getBody().getWorldCenter(), _objects.get(go1).getBody().getWorldCenter());
 					dJntDef.length = jDat.dist;
 					dJntDef.dampingRatio = 1000f;
 					dJntDef.frequencyHz = 1600;
@@ -1516,7 +1523,7 @@ public class MScene2D extends Stage {
 					break;
 				case RevoluteJoint:
 					RevoluteJointDef rJntDef = new RevoluteJointDef();
-					rJntDef.initialize(_objects.get(go0).body, _objects.get(go1).body, jDat.anchor);
+					rJntDef.initialize(_objects.get(go0).getBody(), _objects.get(go1).getBody(), jDat.anchor);
 					rJntDef.enableLimit = jDat.limit;
 					rJntDef.lowerAngle = (float) Math.toRadians(jDat.limitL);
 					rJntDef.upperAngle = (float) Math.toRadians(jDat.limitU);
@@ -1525,8 +1532,8 @@ public class MScene2D extends Stage {
 					break;
 				case RopeJoint:
 					RopeJointDef rpJntDef = new RopeJointDef();
-					rpJntDef.bodyA = _objects.get(go0).body;
-					rpJntDef.bodyB = _objects.get(go1).body;
+					rpJntDef.bodyA = _objects.get(go0).getBody();
+					rpJntDef.bodyB = _objects.get(go1).getBody();
 					rpJntDef.maxLength = jDat.dist;
 					rpJntDef.collideConnected = true;
 
@@ -1585,7 +1592,7 @@ public class MScene2D extends Stage {
 	public void addLightToBody(String light, String body) {
 		doLater(() -> {
 			if (_lights.get(light) != null && _objects.get(body) != null)
-				_lights.get(light).attachToBody(_objects.get(body).body);
+				_lights.get(light).attachToBody(_objects.get(body).getBody());
 		});
 	}
 
@@ -1763,8 +1770,8 @@ public class MScene2D extends Stage {
 
 		handler.setCombinedMatrix(this.getCamera().combined, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		handler.render();
-		
-		//b2dr.render(_world, this.getCamera().projection);
+
+		// b2dr.render(_world, this.getCamera().projection);
 	}
 
 	/**
@@ -1998,7 +2005,7 @@ public class MScene2D extends Stage {
 	@Override
 	public void dispose() {
 		super.dispose();
-		
+
 		b2dr.dispose();
 		_world.dispose();
 		for (MParticleSystem sys : _particleSystems.values())

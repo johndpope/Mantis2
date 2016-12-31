@@ -238,6 +238,16 @@ public class MObjectRef {
 	}
 
 	/**
+	 * Applies torque to the referred MGameObject.
+	 * 
+	 * @param deg
+	 *            The torque to apply.
+	 */
+	public void applyTorque(float amt) {
+		_owningScene.applyTorque(_name, amt);
+	}
+
+	/**
 	 * Sets the flip of the referred MGameObject.
 	 * 
 	 * @param x

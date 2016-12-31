@@ -271,6 +271,11 @@ public class MLoader {
 					? Boolean.parseBoolean(((Element) objects.item(i)).getElementsByTagName("rotate").item(0)
 							.getAttributes().getNamedItem("value").getNodeValue())
 					: false;
+			boolean physical = false;
+			if (((Element) objects.item(i)).getElementsByTagName("physical").getLength() > 0) {
+				physical = Boolean.parseBoolean(((Element) objects.item(i)).getElementsByTagName("physical").item(0)
+						.getAttributes().getNamedItem("value").getNodeValue());
+			}
 			if (((Element) objects.item(i)).getElementsByTagName("phystype").getLength() > 0)
 				switch (((Element) objects.item(i)).getElementsByTagName("phystype").item(0).getAttributes()
 						.getNamedItem("value").getNodeValue()) {
@@ -293,7 +298,7 @@ public class MLoader {
 			mask = Short.parseShort(((Element) objects.item(i)).getElementsByTagName("mask").item(0).getAttributes()
 					.getNamedItem("value").getNodeValue());
 			scene.createGObject(name, type, new Vector2(initialX, initialY), new Vector2(width, height), texture,
-					circle, rotate, category, group, mask);
+					circle, rotate, category, group, mask, physical);
 		}
 
 		// Parse lights

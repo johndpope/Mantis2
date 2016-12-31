@@ -34,13 +34,14 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class MGameObject extends Actor {
 
-	volatile Body body;
-	volatile Fixture fixture;
-	volatile TextureRegion tex;
-	volatile Sprite drawSprite;
-	boolean flipX = false, flipY = false;
-	float opacity = 1.0f;
-	float rotOffset = 0.0f;
+	private Body _body;
+	private Fixture _fixture;
+	private TextureRegion _tex;
+	private Sprite _drawSprite;
+	private boolean _flipX = false, _flipY = false;
+	private float _opacity = 1.0f;
+	private float _rotOffset = 0.0f;
+	private boolean _physical;
 
 	/**
 	 * Creates a game object.
@@ -69,48 +70,54 @@ public class MGameObject extends Actor {
 	 *            Mask bit.
 	 */
 	public MGameObject(World world, String name, BodyType type, Vector2 initialPos, Vector2 initialSize,
-			TextureRegion texture, boolean circular, boolean rotate, int cat, int group, int mask) {
-		FixtureDef fDef = new FixtureDef();
-		fDef.density = 1f;
-		fDef.friction = 0.5f;
-		fDef.restitution = 0.25f;
+			TextureRegion texture, boolean circular, boolean rotate, int cat, int group, int mask, boolean physical) {
+		_physical = physical;
+		if (_physical) {
+			FixtureDef fDef = new FixtureDef();
+			fDef.density = 1f;
+			fDef.friction = 0.5f;
+			fDef.restitution = 0.25f;
 
-		fDef.filter.categoryBits = (short) cat;
-		fDef.filter.groupIndex = (short) group;
-		fDef.filter.maskBits = (short) mask;
+			fDef.filter.categoryBits = (short) cat;
+			fDef.filter.groupIndex = (short) group;
+			fDef.filter.maskBits = (short) mask;
 
-		Shape shape;
+			Shape shape;
 
-		if (circular) {
-			shape = new CircleShape();
-			((CircleShape) shape).setRadius(initialSize.x);
+			if (circular) {
+				shape = new CircleShape();
+				((CircleShape) shape).setRadius(initialSize.x);
+			} else {
+				shape = new PolygonShape();
+				((PolygonShape) shape).setAsBox(initialSize.x, initialSize.y);
+			}
+			fDef.shape = shape;
+
+			BodyDef bDef = new BodyDef();
+			bDef.gravityScale = 5f;
+			bDef.bullet = true;
+			bDef.fixedRotation = !rotate;
+			bDef.type = type;
+			bDef.allowSleep = true;
+
+			_body = world.createBody(bDef);
+			_body.setUserData(name);
+			_body.setTransform(initialPos.x, initialPos.y, 0.0f);
+			_body.setSleepingAllowed(true);
+			_fixture = _body.createFixture(fDef);
+
+			setPosition(_body.getPosition().x, _body.getPosition().y);
+			setRotation((float) Math.toDegrees(_body.getAngle()));
+			setSize(initialSize.x, initialSize.y);
 		} else {
-			shape = new PolygonShape();
-			((PolygonShape) shape).setAsBox(initialSize.x, initialSize.y);
+			setPosition(initialPos.x, initialPos.y);
+			setSize(initialSize.x, initialSize.y);
 		}
-		fDef.shape = shape;
 
-		BodyDef bDef = new BodyDef();
-		bDef.gravityScale = 5f;
-		bDef.bullet = true;
-		bDef.fixedRotation = !rotate;
-		bDef.type = type;
-		bDef.allowSleep = true;
+		_tex = new TextureRegion(texture);
+		_drawSprite = new Sprite(_tex);
 
-		body = world.createBody(bDef);
-		body.setUserData(name);
-		body.setTransform(initialPos.x, initialPos.y, 0.0f);
-		body.setSleepingAllowed(true);
-		fixture = body.createFixture(fDef);
-
-		tex = new TextureRegion(texture);
-		drawSprite = new Sprite(tex);
-
-		this.setPosition(body.getPosition().x, body.getPosition().y);
-		this.setRotation((float) Math.toDegrees(body.getAngle()));
-		this.setSize(initialSize.x, initialSize.y);
-
-		drawSprite.setSize(this.getWidth(), this.getHeight());
+		_drawSprite.setSize(getWidth(), getHeight());
 	}
 
 	/**
@@ -140,20 +147,74 @@ public class MGameObject extends Actor {
 	 *            Mask bit.
 	 */
 	public MGameObject(World world, String name, BodyType type, Vector2 initialPos, Vector2 initialSize, String texture,
-			boolean circular, boolean rotate, int cat, int group, int mask) {
+			boolean circular, boolean rotate, int cat, int group, int mask, boolean physical) {
 		this(world, name, type, initialPos, initialSize, new TextureRegion(new Texture(texture)), circular, rotate, cat,
-				group, mask);
+				group, mask, physical);
 	}
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		drawSprite.setPosition(this.getX(), this.getY());
-		drawSprite.setOrigin(drawSprite.getWidth() / 2.0f, drawSprite.getHeight() / 2.0f);
-		drawSprite.setFlip(flipX, flipY);
-		drawSprite.setScale(2.0f);
-		drawSprite.setRotation(this.getRotation());
-		drawSprite.setAlpha(opacity);
-		drawSprite.draw(batch);
+		_drawSprite.setPosition(getX(), getY());
+		_drawSprite.setOrigin(_drawSprite.getWidth() / 2.0f, _drawSprite.getHeight() / 2.0f);
+		_drawSprite.setFlip(_flipX, _flipY);
+		_drawSprite.setScale(2.0f);
+		_drawSprite.setRotation(getRotation());
+		_drawSprite.setAlpha(_opacity);
+		_drawSprite.draw(batch);
+	}
+
+	/**
+	 * Sets the position of this object.
+	 * 
+	 * @param x
+	 *            The new X position.
+	 * @param y
+	 *            The new Y position.
+	 */
+	public void setPos(float x, float y) {
+		if (_physical) {
+			_body.setTransform(x, y, _body.getAngle());
+		} else {
+			setPosition(x, y);
+		}
+	}
+
+	/**
+	 * Sets the position of this object.
+	 * 
+	 * @param pos
+	 *            The new position.
+	 */
+	public void setPosition(Vector2 pos) {
+		setPos(pos.x, pos.y);
+	}
+
+	/**
+	 * Rotates this object by an angle.
+	 * 
+	 * @param angle
+	 *            The angle to rotate by.
+	 */
+	public void rotate(float angle) {
+		if (_physical) {
+			_body.setTransform(_body.getPosition(), angle);
+		} else {
+			rotateBy(angle);
+		}
+	}
+
+	/**
+	 * Sets the rotation of this object in degrees.
+	 * 
+	 * @param angle
+	 *            The new rotation.
+	 */
+	public void setRot(float angle) {
+		if (_physical) {
+			_body.setTransform(_body.getPosition(), angle);
+		} else {
+			setRotation(angle);
+		}
 	}
 
 	/**
@@ -163,10 +224,10 @@ public class MGameObject extends Actor {
 	 *            New TextureRegion to use.
 	 */
 	public void setTex(TextureRegion reg) {
-		tex = reg;
-		Vector2 oldSize = new Vector2(drawSprite.getWidth(), drawSprite.getHeight());
-		drawSprite = new Sprite(tex);
-		drawSprite.setSize(oldSize.x, oldSize.y);
+		_tex = reg;
+		Vector2 oldSize = new Vector2(_drawSprite.getWidth(), _drawSprite.getHeight());
+		_drawSprite = new Sprite(_tex);
+		_drawSprite.setSize(oldSize.x, oldSize.y);
 	}
 
 	/**
@@ -176,7 +237,7 @@ public class MGameObject extends Actor {
 	 *            The new sprite rotation offset.
 	 */
 	public void setSpriteRotOffset(float rot) {
-		rotOffset = rot;
+		_rotOffset = rot;
 	}
 
 	/**
@@ -185,19 +246,115 @@ public class MGameObject extends Actor {
 	 * @return The sprite rotation offset.
 	 */
 	public float getSpriteRotOffset() {
-		return rotOffset;
+		return _rotOffset;
+	}
+
+	/**
+	 * Checks whether or not this object is flipped on the X axis.
+	 * 
+	 * @return Whether or not this object is flipped on the X axis.
+	 */
+	public boolean isFlippedX() {
+		return _flipX;
+	}
+
+	/**
+	 * Checks whether or not this object is flipped on the Y axis.
+	 * 
+	 * @return Whether or not this object is flipped on the Y axis.
+	 */
+	public boolean isFlippedY() {
+		return _flipY;
+	}
+
+	/**
+	 * Gets the opacity of this object.
+	 * 
+	 * @return This object's opacity.
+	 */
+	public float getOpacity() {
+		return _opacity;
+	}
+
+	/**
+	 * Sets the XY flip of this object.
+	 * 
+	 * @param x
+	 *            The new X flip of this object.
+	 * @param y
+	 *            The new Y flip of this object.
+	 */
+	public void setFlip(boolean x, boolean y) {
+		_flipX = x;
+		_flipY = y;
+	}
+
+	/**
+	 * Sets the X flip of this object.
+	 * 
+	 * @param flip
+	 *            The new X flip.
+	 */
+	public void setFlipX(boolean flip) {
+		_flipX = flip;
+	}
+
+	/**
+	 * Sets the Y flip of this object.
+	 * 
+	 * @param flip
+	 *            The new Y flip.
+	 */
+	public void setFlipY(boolean flip) {
+		_flipY = flip;
+	}
+
+	/**
+	 * Sets the opacity of this object.
+	 * 
+	 * @param opacity
+	 *            The new opacity of this object.
+	 */
+	public void setOpacity(float opacity) {
+		_opacity = opacity;
+	}
+
+	/**
+	 * Gets the body of this object.
+	 * 
+	 * @return This object's physics body (if applicable).
+	 */
+	public Body getBody() {
+		return _body;
+	}
+
+	/**
+	 * Gets the fixture of this object.
+	 * 
+	 * @return This object's physics fixture (if applicable).
+	 */
+	public Fixture getFixture() {
+		return _fixture;
+	}
+
+	/**
+	 * Gets the render sprite of this object.
+	 * 
+	 * @return This object's render sprite.
+	 */
+	public Sprite getDrawSprite() {
+		return _drawSprite;
 	}
 
 	/**
 	 * Update this object.
 	 */
 	public void update() {
-		this.setPosition(
-				body.getPosition().x - (drawSprite.getWidth() / 2.0f),
-				body.getPosition().y - (drawSprite.getHeight() / 2.0f)
-				);
-
-		this.setRotation((float) Math.toDegrees(body.getAngle()) + rotOffset);
+		if (_physical) {
+			setPosition(_body.getPosition().x - (_drawSprite.getWidth() / 2.0f),
+					_body.getPosition().y - (_drawSprite.getHeight() / 2.0f));
+			setRotation((float) Math.toDegrees(_body.getAngle()) + _rotOffset);
+		}
 	}
 
 }

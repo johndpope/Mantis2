@@ -27,8 +27,8 @@ import static com.aftershock.mantis.scene.util.MUtil.*;
 public class MapLoader {
 	static TmxMapLoader tMapLoader = new TmxMapLoader();
 
-	private static void _processMap(MScene2D s, TiledMapTile[][][] mapData, float smallestW, float smallestH, float scale,
-			float padding, String[] prefixes, boolean[] sensors, int[] cats, int[] groups, int[] masks,
+	private static void _processMap(MScene2D s, TiledMapTile[][][] mapData, float smallestW, float smallestH,
+			float scale, float padding, String[] prefixes, boolean[] sensors, int[] cats, int[] groups, int[] masks,
 			boolean isometric) {
 
 		int w = mapData[0].length, h = mapData[0][0].length;
@@ -59,9 +59,11 @@ public class MapLoader {
 						// Populate Scene
 						s.createGObject(name, BodyType.StaticBody, vec((xPos * SOX) / 2, (yPos * SOY) / 2).scl(scale),
 								vec(tileW + padding, tileH + padding).scl(scale), tile.getTextureRegion(), false, false,
-								cats[z], groups[z], masks[z]);
-						s.setGObjectRot(name, 30);
-						s.setGObjectRotOffset(name, -30);
+								cats[z], groups[z], masks[z], (cats[z] + groups[z] + masks[z]) != 0);
+						if ((cats[z] + groups[z] + masks[z]) != 0) {
+							s.setGObjectRot(name, 30);
+							s.setGObjectRotOffset(name, -30);
+						}
 
 					}
 				}
@@ -92,7 +94,8 @@ public class MapLoader {
 						// Populate Scene
 						s.createGObject(name, BodyType.StaticBody, new Vector2(SOX, SOY).scl(scale),
 								new Vector2(tileW * scale, tileH * scale).add(padding, padding),
-								tile.getTextureRegion(), false, false, cats[z], groups[z], masks[z]);
+								tile.getTextureRegion(), false, false, cats[z], groups[z], masks[z],
+								(cats[z] + groups[z] + masks[z]) != 0);
 					}
 				}
 			}
@@ -118,22 +121,22 @@ public class MapLoader {
 		int w = firstLayer.getWidth();
 		int h = firstLayer.getHeight();
 		int lCount = tMap.getLayers().getCount();
-		
+
 		TiledMapTile[][][] layers = new TiledMapTile[lCount][w][h];
 		String[] prefixes = new String[lCount];
 		float smallestW = 0.0f, smallestH = 0.0f;
-		
+
 		boolean[] sensors = new boolean[lCount];
 		int[] cats = new int[lCount];
 		int[] groups = new int[lCount];
 		int[] masks = new int[lCount];
-		
+
 		for (int lNum = 0; lNum < lCount; lNum++) {
 			TiledMapTileLayer layer = (TiledMapTileLayer) tMap.getLayers().get(lNum);
 			smallestW = layer.getTileWidth();
 			smallestH = layer.getTileHeight();
 			prefixes[lNum] = layer.getName();
-			if (layer.getProperties().containsKey("cat")) 
+			if (layer.getProperties().containsKey("cat"))
 				cats[lNum] = Integer.parseInt((String) layer.getProperties().get("cat"));
 			if (layer.getProperties().containsKey("group"))
 				groups[lNum] = Integer.parseInt((String) layer.getProperties().get("group"));
@@ -141,13 +144,13 @@ public class MapLoader {
 				masks[lNum] = Integer.parseInt((String) layer.getProperties().get("mask"));
 			if (layer.getProperties().containsKey("sensor"))
 				sensors[lNum] = Boolean.parseBoolean((String) layer.getProperties().get("sensor"));
-			
+
 			for (int x = 0; x < w; x++)
 				for (int y = 0; y < h; y++)
 					if (layer.getCell(x, y) != null)
 						layers[lNum][x][y] = layer.getCell(x, y).getTile();
 		}
-		
+
 		_processMap(s, layers, smallestW, smallestH, scale, padding, prefixes, sensors, cats, groups, masks, isometric);
 		return new Vector2(w, h);
 	}
