@@ -1810,6 +1810,34 @@ public class MScene2D extends Stage {
 	}
 
 	/**
+	 * Gets the mouse position in screen coordinates.
+	 * 
+	 * @return The mouse position on the screen.
+	 */
+	public Vector2 getMousePos() {
+		return new Vector2(Gdx.input.getX(), -Gdx.input.getY());
+	}
+
+	/**
+	 * Gets the mouse position in screen coordinates relative to the center of
+	 * the screen.
+	 * 
+	 * @return The mouse position relative to the screen's center.
+	 */
+	public Vector2 getMouseCenteredPos() {
+		return getMousePos().add(-getCenter().x, getCenter().y);
+	}
+
+	/**
+	 * Gets the mouse position in world coordinates.
+	 * 
+	 * @return The mouse position in the world.
+	 */
+	public Vector2 getMouseWorldPos() {
+		return screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+	}
+
+	/**
 	 * Updates the scene.
 	 * 
 	 * @param delta
