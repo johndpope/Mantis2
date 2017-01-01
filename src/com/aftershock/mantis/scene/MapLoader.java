@@ -56,15 +56,15 @@ public class MapLoader {
 						float xPos = x - y;
 						float yPos = h - (x + y);
 
+						boolean physical = (cats[z] + groups[z] + masks[z]) != 0;
 						// Populate Scene
 						s.createGObject(name, BodyType.StaticBody, vec((xPos * SOX) / 2, (yPos * SOY) / 2).scl(scale),
 								vec(tileW + padding, tileH + padding).scl(scale), tile.getTextureRegion(), false, false,
-								cats[z], groups[z], masks[z], (cats[z] + groups[z] + masks[z]) != 0);
-						if ((cats[z] + groups[z] + masks[z]) != 0) {
-							s.setGObjectRot(name, 30);
-							s.setGObjectRotOffset(name, -30);
+								cats[z], groups[z], masks[z], physical);
+						if (physical) {
+							s.setGObjectRot(name, -30);
+							s.setGObjectRotOffset(name, 30);
 						}
-
 					}
 				}
 

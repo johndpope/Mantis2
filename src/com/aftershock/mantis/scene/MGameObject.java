@@ -155,11 +155,16 @@ public class MGameObject extends Actor {
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		_drawSprite.setPosition(getX(), getY());
-		_drawSprite.setOrigin(_drawSprite.getWidth() / 2.0f, _drawSprite.getHeight() / 2.0f);
+		if (_physical)
+			_drawSprite.setOrigin(_body.getLocalCenter().x, _body.getLocalCenter().y);
+		else
+			_drawSprite.setOrigin(_drawSprite.getWidth() / 2.0f, _drawSprite.getHeight() / 2.0f);
 		_drawSprite.setFlip(_flipX, _flipY);
 		_drawSprite.setScale(2.0f);
-		_drawSprite.setRotation(getRotation());
+		_drawSprite.setRotation(getRotation() + _rotOffset + ((_physical) ? 5 : 0));
 		_drawSprite.setAlpha(_opacity);
+		if (_physical)
+			_drawSprite.translate(_drawSprite.getOriginX(), _drawSprite.getOriginY());
 		_drawSprite.draw(batch);
 	}
 
@@ -197,7 +202,7 @@ public class MGameObject extends Actor {
 	 */
 	public void rotate(float angle) {
 		if (_physical) {
-			_body.setTransform(_body.getPosition(), angle);
+			_body.setTransform(_body.getWorldCenter(), angle - 90);
 		} else {
 			rotateBy(angle);
 		}
@@ -211,7 +216,7 @@ public class MGameObject extends Actor {
 	 */
 	public void setRot(float angle) {
 		if (_physical) {
-			_body.setTransform(_body.getPosition(), angle);
+			_body.setTransform(_body.getWorldCenter(), angle - 90);
 		} else {
 			setRotation(angle);
 		}
@@ -353,7 +358,7 @@ public class MGameObject extends Actor {
 		if (_physical) {
 			setPosition(_body.getPosition().x - (_drawSprite.getWidth() / 2.0f),
 					_body.getPosition().y - (_drawSprite.getHeight() / 2.0f));
-			setRotation((float) Math.toDegrees(_body.getAngle()) + _rotOffset);
+			setRotation((float) Math.toDegrees(_body.getAngle()));
 		}
 	}
 
