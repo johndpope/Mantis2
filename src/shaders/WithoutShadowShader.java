@@ -27,7 +27,6 @@ public final class WithoutShadowShader {
 		ShaderProgram woShadowShader = new ShaderProgram(vertexShader, fragmentShader);
 		if (woShadowShader.isCompiled() == false) {
 			Gdx.app.log("ERROR", woShadowShader.getLog());
-
 		}
 
 		return woShadowShader;

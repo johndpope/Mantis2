@@ -1,9 +1,9 @@
 package shaders;
 
-import box2dLight.RayHandler;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+
+import box2dLight.RayHandler;
 
 public class Gaussian {
 

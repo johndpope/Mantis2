@@ -29,7 +29,6 @@ public class DiffuseShader {
 		ShaderProgram shadowShader = new ShaderProgram(vertexShader, fragmentShader);
 		if (shadowShader.isCompiled() == false) {
 			Gdx.app.log("ERROR", shadowShader.getLog());
-
 		}
 
 		return shadowShader;

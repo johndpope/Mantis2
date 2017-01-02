@@ -1,13 +1,5 @@
 package com.aftershock.mantis.scene;
 
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-
-import static com.aftershock.mantis.scene.util.MUtil.*;
 /*
  * Copyright 2016-2017 Luke Diamond
  * 
@@ -23,6 +15,14 @@ import static com.aftershock.mantis.scene.util.MUtil.*;
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+import static com.aftershock.mantis.scene.util.MUtil.vec;
+
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 public class MapLoader {
 	static TmxMapLoader tMapLoader = new TmxMapLoader();

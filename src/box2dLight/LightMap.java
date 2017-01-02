@@ -1,10 +1,5 @@
 package box2dLight;
 
-import shaders.DiffuseShader;
-import shaders.Gaussian;
-import shaders.ShadowShader;
-import shaders.WithoutShadowShader;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -14,6 +9,11 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+
+import shaders.DiffuseShader;
+import shaders.Gaussian;
+import shaders.ShadowShader;
+import shaders.WithoutShadowShader;
 
 class LightMap {
 	private ShaderProgram shadowShader;
