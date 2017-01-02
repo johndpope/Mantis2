@@ -41,7 +41,7 @@ import box2dLight.PointLight;
 import box2dLight.RayHandler;
 
 /*
- * Copyright 2016 Luke Diamond
+ * Copyright 2016-2017 Luke Diamond
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain a
