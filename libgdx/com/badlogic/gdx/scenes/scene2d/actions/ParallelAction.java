@@ -21,41 +21,38 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
-/**
- * Executes a number of actions at the same time.
- * 
- * @author Nathan Sweet
- */
+/** Executes a number of actions at the same time.
+ * @author Nathan Sweet */
 public class ParallelAction extends Action {
 	Array<Action> actions = new Array(4);
 	private boolean complete;
 
-	public ParallelAction() {
+	public ParallelAction () {
 	}
 
-	public ParallelAction(Action action1) {
+	public ParallelAction (Action action1) {
 		addAction(action1);
 	}
 
-	public ParallelAction(Action action1, Action action2) {
+	public ParallelAction (Action action1, Action action2) {
 		addAction(action1);
 		addAction(action2);
 	}
 
-	public ParallelAction(Action action1, Action action2, Action action3) {
+	public ParallelAction (Action action1, Action action2, Action action3) {
 		addAction(action1);
 		addAction(action2);
 		addAction(action3);
 	}
 
-	public ParallelAction(Action action1, Action action2, Action action3, Action action4) {
+	public ParallelAction (Action action1, Action action2, Action action3, Action action4) {
 		addAction(action1);
 		addAction(action2);
 		addAction(action3);
 		addAction(action4);
 	}
 
-	public ParallelAction(Action action1, Action action2, Action action3, Action action4, Action action5) {
+	public ParallelAction (Action action1, Action action2, Action action3, Action action4, Action action5) {
 		addAction(action1);
 		addAction(action2);
 		addAction(action3);
@@ -63,21 +60,17 @@ public class ParallelAction extends Action {
 		addAction(action5);
 	}
 
-	public boolean act(float delta) {
-		if (complete)
-			return true;
+	public boolean act (float delta) {
+		if (complete) return true;
 		complete = true;
 		Pool pool = getPool();
-		setPool(null); // Ensure this action can't be returned to the pool while
-						// executing.
+		setPool(null); // Ensure this action can't be returned to the pool while executing.
 		try {
 			Array<Action> actions = this.actions;
 			for (int i = 0, n = actions.size; i < n && actor != null; i++) {
 				Action currentAction = actions.get(i);
-				if (currentAction.getActor() != null && !currentAction.act(delta))
-					complete = false;
-				if (actor == null)
-					return true; // This action was removed.
+				if (currentAction.getActor() != null && !currentAction.act(delta)) complete = false;
+				if (actor == null) return true; // This action was removed.
 			}
 			return complete;
 		} finally {
@@ -85,43 +78,41 @@ public class ParallelAction extends Action {
 		}
 	}
 
-	public void restart() {
+	public void restart () {
 		complete = false;
 		Array<Action> actions = this.actions;
 		for (int i = 0, n = actions.size; i < n; i++)
 			actions.get(i).restart();
 	}
 
-	public void reset() {
+	public void reset () {
 		super.reset();
 		actions.clear();
 	}
 
-	public void addAction(Action action) {
+	public void addAction (Action action) {
 		actions.add(action);
-		if (actor != null)
-			action.setActor(actor);
+		if (actor != null) action.setActor(actor);
 	}
 
-	public void setActor(Actor actor) {
+	public void setActor (Actor actor) {
 		Array<Action> actions = this.actions;
 		for (int i = 0, n = actions.size; i < n; i++)
 			actions.get(i).setActor(actor);
 		super.setActor(actor);
 	}
 
-	public Array<Action> getActions() {
+	public Array<Action> getActions () {
 		return actions;
 	}
 
-	public String toString() {
+	public String toString () {
 		StringBuilder buffer = new StringBuilder(64);
 		buffer.append(super.toString());
 		buffer.append('(');
 		Array<Action> actions = this.actions;
 		for (int i = 0, n = actions.size; i < n; i++) {
-			if (i > 0)
-				buffer.append(", ");
+			if (i > 0) buffer.append(", ");
 			buffer.append(actions.get(i));
 		}
 		buffer.append(')');

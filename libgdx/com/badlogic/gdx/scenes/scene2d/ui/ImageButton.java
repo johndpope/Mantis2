@@ -20,31 +20,26 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Scaling;
 
-/**
- * A button with a child {@link Image} to display an image. This is useful when
- * the button must be larger than the image and the image centered on the
- * button. If the image is the size of the button, a {@link Button} without any
- * children can be used, where the {@link Button.ButtonStyle#up},
- * {@link Button.ButtonStyle#down}, and {@link Button.ButtonStyle#checked} nine
- * patches define the image.
- * 
- * @author Nathan Sweet
- */
+/** A button with a child {@link Image} to display an image. This is useful when the button must be larger than the image and the
+ * image centered on the button. If the image is the size of the button, a {@link Button} without any children can be used, where
+ * the {@link Button.ButtonStyle#up}, {@link Button.ButtonStyle#down}, and {@link Button.ButtonStyle#checked} nine patches define
+ * the image.
+ * @author Nathan Sweet */
 public class ImageButton extends Button {
 	private final Image image;
 	private ImageButtonStyle style;
 
-	public ImageButton(Skin skin) {
+	public ImageButton (Skin skin) {
 		this(skin.get(ImageButtonStyle.class));
 		setSkin(skin);
 	}
 
-	public ImageButton(Skin skin, String styleName) {
+	public ImageButton (Skin skin, String styleName) {
 		this(skin.get(styleName, ImageButtonStyle.class));
 		setSkin(skin);
 	}
 
-	public ImageButton(ImageButtonStyle style) {
+	public ImageButton (ImageButtonStyle style) {
 		super(style);
 		image = new Image();
 		image.setScaling(Scaling.fit);
@@ -53,32 +48,30 @@ public class ImageButton extends Button {
 		setSize(getPrefWidth(), getPrefHeight());
 	}
 
-	public ImageButton(Drawable imageUp) {
+	public ImageButton (Drawable imageUp) {
 		this(new ImageButtonStyle(null, null, null, imageUp, null, null));
 	}
 
-	public ImageButton(Drawable imageUp, Drawable imageDown) {
+	public ImageButton (Drawable imageUp, Drawable imageDown) {
 		this(new ImageButtonStyle(null, null, null, imageUp, imageDown, null));
 	}
 
-	public ImageButton(Drawable imageUp, Drawable imageDown, Drawable imageChecked) {
+	public ImageButton (Drawable imageUp, Drawable imageDown, Drawable imageChecked) {
 		this(new ImageButtonStyle(null, null, null, imageUp, imageDown, imageChecked));
 	}
 
-	public void setStyle(ButtonStyle style) {
-		if (!(style instanceof ImageButtonStyle))
-			throw new IllegalArgumentException("style must be an ImageButtonStyle.");
+	public void setStyle (ButtonStyle style) {
+		if (!(style instanceof ImageButtonStyle)) throw new IllegalArgumentException("style must be an ImageButtonStyle.");
 		super.setStyle(style);
-		this.style = (ImageButtonStyle) style;
-		if (image != null)
-			updateImage();
+		this.style = (ImageButtonStyle)style;
+		if (image != null) updateImage();
 	}
 
-	public ImageButtonStyle getStyle() {
+	public ImageButtonStyle getStyle () {
 		return style;
 	}
 
-	private void updateImage() {
+	private void updateImage () {
 		Drawable drawable = null;
 		if (isDisabled() && style.imageDisabled != null)
 			drawable = style.imageDisabled;
@@ -93,40 +86,37 @@ public class ImageButton extends Button {
 		image.setDrawable(drawable);
 	}
 
-	public void draw(Batch batch, float parentAlpha) {
+	public void draw (Batch batch, float parentAlpha) {
 		updateImage();
 		super.draw(batch, parentAlpha);
 	}
 
-	public Image getImage() {
+	public Image getImage () {
 		return image;
 	}
 
-	public Cell getImageCell() {
+	public Cell getImageCell () {
 		return getCell(image);
 	}
 
-	/**
-	 * The style for an image button, see {@link ImageButton}.
-	 * 
-	 * @author Nathan Sweet
-	 */
+	/** The style for an image button, see {@link ImageButton}.
+	 * @author Nathan Sweet */
 	static public class ImageButtonStyle extends ButtonStyle {
 		/** Optional. */
 		public Drawable imageUp, imageDown, imageOver, imageChecked, imageCheckedOver, imageDisabled;
 
-		public ImageButtonStyle() {
+		public ImageButtonStyle () {
 		}
 
-		public ImageButtonStyle(Drawable up, Drawable down, Drawable checked, Drawable imageUp, Drawable imageDown,
-				Drawable imageChecked) {
+		public ImageButtonStyle (Drawable up, Drawable down, Drawable checked, Drawable imageUp, Drawable imageDown,
+			Drawable imageChecked) {
 			super(up, down, checked);
 			this.imageUp = imageUp;
 			this.imageDown = imageDown;
 			this.imageChecked = imageChecked;
 		}
 
-		public ImageButtonStyle(ImageButtonStyle style) {
+		public ImageButtonStyle (ImageButtonStyle style) {
 			super(style);
 			this.imageUp = style.imageUp;
 			this.imageDown = style.imageDown;
@@ -136,7 +126,7 @@ public class ImageButton extends Button {
 			this.imageDisabled = style.imageDisabled;
 		}
 
-		public ImageButtonStyle(ButtonStyle style) {
+		public ImageButtonStyle (ButtonStyle style) {
 			super(style);
 		}
 	}

@@ -36,10 +36,7 @@ public class TextArea extends TextField {
 	/** Array storing lines breaks positions **/
 	IntArray linesBreak;
 
-	/**
-	 * Last text processed. This attribute is used to avoid unnecessary
-	 * computations while calculating offsets
-	 **/
+	/** Last text processed. This attribute is used to avoid unnecessary computations while calculating offsets **/
 	private String lastText;
 
 	/** Current line for the cursor **/
@@ -51,28 +48,25 @@ public class TextArea extends TextField {
 	/** Number of lines showed by the text area **/
 	private int linesShowing;
 
-	/**
-	 * Variable to maintain the x offset of the cursor when moving up and down.
-	 * If it's set to -1, the offset is reset
-	 **/
+	/** Variable to maintain the x offset of the cursor when moving up and down. If it's set to -1, the offset is reset **/
 	float moveOffset;
 
 	private float prefRows;
 
-	public TextArea(String text, Skin skin) {
+	public TextArea (String text, Skin skin) {
 		super(text, skin);
 	}
 
-	public TextArea(String text, Skin skin, String styleName) {
+	public TextArea (String text, Skin skin, String styleName) {
 		super(text, skin, styleName);
 	}
 
-	public TextArea(String text, TextFieldStyle style) {
+	public TextArea (String text, TextFieldStyle style) {
 		super(text, style);
 	}
 
 	@Override
-	protected void initialize() {
+	protected void initialize () {
 		super.initialize();
 		writeEnters = true;
 		linesBreak = new IntArray();
@@ -82,7 +76,7 @@ public class TextArea extends TextField {
 		linesShowing = 0;
 	}
 
-	protected int letterUnderCursor(float x) {
+	protected int letterUnderCursor (float x) {
 		if (linesBreak.size > 0) {
 			if (cursorLine * 2 >= linesBreak.size) {
 				return text.length();
@@ -93,10 +87,8 @@ public class TextArea extends TextField {
 				int end = linesBreak.items[cursorLine * 2 + 1];
 				int i = start;
 				for (; i < end; i++)
-					if (glyphPositions[i] > x)
-						break;
-				if (glyphPositions[i] - x <= x - glyphPositions[i - 1])
-					return i;
+					if (glyphPositions[i] > x) break;
+				if (glyphPositions[i] - x <= x - glyphPositions[i - 1]) return i;
 				return Math.max(0, i - 1);
 			}
 		} else {
@@ -104,41 +96,38 @@ public class TextArea extends TextField {
 		}
 	}
 
-	/**
-	 * Sets the preferred number of rows (lines) for this text area. Used to
-	 * calculate preferred height
-	 */
-	public void setPrefRows(float prefRows) {
+	/** Sets the preferred number of rows (lines) for this text area. Used to calculate preferred height */
+	public void setPrefRows (float prefRows) {
 		this.prefRows = prefRows;
 	}
 
 	@Override
-	public float getPrefHeight() {
+	public float getPrefHeight () {
 		if (prefRows <= 0) {
 			return super.getPrefHeight();
 		} else {
 			float prefHeight = textHeight * prefRows;
 			if (style.background != null) {
 				prefHeight = Math.max(prefHeight + style.background.getBottomHeight() + style.background.getTopHeight(),
-						style.background.getMinHeight());
+					style.background.getMinHeight());
 			}
 			return prefHeight;
 		}
 	}
 
 	/** Returns total number of lines that the text occupies **/
-	public int getLines() {
+	public int getLines () {
 		return linesBreak.size / 2 + (newLineAtEnd() ? 1 : 0);
 	}
 
 	/** Returns if there's a new line at then end of the text **/
-	public boolean newLineAtEnd() {
+	public boolean newLineAtEnd () {
 		return text.length() != 0
-				&& (text.charAt(text.length() - 1) == ENTER_ANDROID || text.charAt(text.length() - 1) == ENTER_DESKTOP);
+			&& (text.charAt(text.length() - 1) == ENTER_ANDROID || text.charAt(text.length() - 1) == ENTER_DESKTOP);
 	}
 
 	/** Moves the cursor to the given number line **/
-	public void moveCursorLine(int line) {
+	public void moveCursorLine (int line) {
 		if (line < 0) {
 			cursorLine = 0;
 			cursor = 0;
@@ -153,12 +142,12 @@ public class TextArea extends TextField {
 		} else if (line != cursorLine) {
 			if (moveOffset < 0) {
 				moveOffset = linesBreak.size <= cursorLine * 2 ? 0
-						: glyphPositions.get(cursor) - glyphPositions.get(linesBreak.get(cursorLine * 2));
+					: glyphPositions.get(cursor) - glyphPositions.get(linesBreak.get(cursorLine * 2));
 			}
 			cursorLine = line;
 			cursor = cursorLine * 2 >= linesBreak.size ? text.length() : linesBreak.get(cursorLine * 2);
 			while (cursor < text.length() && cursor <= linesBreak.get(cursorLine * 2 + 1) - 1
-					&& glyphPositions.get(cursor) - glyphPositions.get(linesBreak.get(cursorLine * 2)) < moveOffset) {
+				&& glyphPositions.get(cursor) - glyphPositions.get(linesBreak.get(cursorLine * 2)) < moveOffset) {
 				cursor++;
 			}
 			showCursor();
@@ -166,23 +155,22 @@ public class TextArea extends TextField {
 	}
 
 	/** Updates the current line, checking the cursor position in the text **/
-	void updateCurrentLine() {
+	void updateCurrentLine () {
 		int index = calculateCurrentLineIndex(cursor);
 		int line = index / 2;
-		// Special case when cursor moves to the beginning of the line from the
-		// end of another and a word
+		// Special case when cursor moves to the beginning of the line from the end of another and a word
 		// wider than the box
 		if (index % 2 == 0 || index + 1 >= linesBreak.size || cursor != linesBreak.items[index]
-				|| linesBreak.items[index + 1] != linesBreak.items[index]) {
+			|| linesBreak.items[index + 1] != linesBreak.items[index]) {
 			if (line < linesBreak.size / 2 || text.length() == 0 || text.charAt(text.length() - 1) == ENTER_ANDROID
-					|| text.charAt(text.length() - 1) == ENTER_DESKTOP) {
+				|| text.charAt(text.length() - 1) == ENTER_DESKTOP) {
 				cursorLine = line;
 			}
 		}
 	}
 
 	/** Scroll the text area to show the line of the cursor **/
-	void showCursor() {
+	void showCursor () {
 		updateCurrentLine();
 		if (cursorLine != firstLineShowing) {
 			int step = cursorLine >= firstLineShowing ? 1 : -1;
@@ -193,7 +181,7 @@ public class TextArea extends TextField {
 	}
 
 	/** Calculates the text area line for the given cursor position **/
-	private int calculateCurrentLineIndex(int cursor) {
+	private int calculateCurrentLineIndex (int cursor) {
 		int index = 0;
 		while (index < linesBreak.size && cursor > linesBreak.items[index]) {
 			index++;
@@ -204,30 +192,27 @@ public class TextArea extends TextField {
 	// OVERRIDE from TextField
 
 	@Override
-	protected void sizeChanged() {
-		lastText = null; // Cause calculateOffsets to recalculate the line
-							// breaks.
+	protected void sizeChanged () {
+		lastText = null; // Cause calculateOffsets to recalculate the line breaks.
 
-		// The number of lines showed must be updated whenever the height is
-		// updated
+		// The number of lines showed must be updated whenever the height is updated
 		BitmapFont font = style.font;
 		Drawable background = style.background;
-		float availableHeight = getHeight()
-				- (background == null ? 0 : background.getBottomHeight() + background.getTopHeight());
-		linesShowing = (int) Math.floor(availableHeight / font.getLineHeight());
+		float availableHeight = getHeight() - (background == null ? 0 : background.getBottomHeight() + background.getTopHeight());
+		linesShowing = (int)Math.floor(availableHeight / font.getLineHeight());
 	}
 
 	@Override
-	protected float getTextY(BitmapFont font, Drawable background) {
+	protected float getTextY (BitmapFont font, Drawable background) {
 		float textY = getHeight();
 		if (background != null) {
-			textY = (int) (textY - background.getTopHeight());
+			textY = (int)(textY - background.getTopHeight());
 		}
 		return textY;
 	}
 
 	@Override
-	protected void drawSelection(Drawable selection, Batch batch, BitmapFont font, float x, float y) {
+	protected void drawSelection (Drawable selection, Batch batch, BitmapFont font, float x, float y) {
 		int i = firstLineShowing * 2;
 		float offsetY = 0;
 		int minIndex = Math.min(cursor, selectionStart);
@@ -238,7 +223,7 @@ public class TextArea extends TextField {
 			int lineEnd = linesBreak.get(i + 1);
 
 			if (!((minIndex < lineStart && minIndex < lineEnd && maxIndex < lineStart && maxIndex < lineEnd)
-					|| (minIndex > lineStart && minIndex > lineEnd && maxIndex > lineStart && maxIndex > lineEnd))) {
+				|| (minIndex > lineStart && minIndex > lineEnd && maxIndex > lineStart && maxIndex > lineEnd))) {
 
 				int start = Math.max(linesBreak.get(i), minIndex);
 				int end = Math.min(linesBreak.get(i + 1), maxIndex);
@@ -246,8 +231,8 @@ public class TextArea extends TextField {
 				float selectionX = glyphPositions.get(start) - glyphPositions.get(linesBreak.get(i));
 				float selectionWidth = glyphPositions.get(end) - glyphPositions.get(start);
 
-				selection.draw(batch, x + selectionX + fontOffset, y - textHeight - font.getDescent() - offsetY,
-						selectionWidth, font.getLineHeight());
+				selection.draw(batch, x + selectionX + fontOffset, y - textHeight - font.getDescent() - offsetY, selectionWidth,
+					font.getLineHeight());
 			}
 
 			offsetY += font.getLineHeight();
@@ -256,32 +241,31 @@ public class TextArea extends TextField {
 	}
 
 	@Override
-	protected void drawText(Batch batch, BitmapFont font, float x, float y) {
+	protected void drawText (Batch batch, BitmapFont font, float x, float y) {
 		float offsetY = 0;
 		for (int i = firstLineShowing * 2; i < (firstLineShowing + linesShowing) * 2 && i < linesBreak.size; i += 2) {
-			font.draw(batch, displayText, x, y + offsetY, linesBreak.items[i], linesBreak.items[i + 1], 0, Align.left,
-					false);
+			font.draw(batch, displayText, x, y + offsetY, linesBreak.items[i], linesBreak.items[i + 1], 0, Align.left, false);
 			offsetY -= font.getLineHeight();
 		}
 	}
 
 	@Override
-	protected void drawCursor(Drawable cursorPatch, Batch batch, BitmapFont font, float x, float y) {
+	protected void drawCursor (Drawable cursorPatch, Batch batch, BitmapFont font, float x, float y) {
 		float textOffset = cursor >= glyphPositions.size || cursorLine * 2 >= linesBreak.size ? 0
-				: glyphPositions.get(cursor) - glyphPositions.get(linesBreak.items[cursorLine * 2]);
+			: glyphPositions.get(cursor) - glyphPositions.get(linesBreak.items[cursorLine * 2]);
 		cursorPatch.draw(batch, x + textOffset + fontOffset + font.getData().cursorX,
-				y - font.getDescent() / 2 - (cursorLine - firstLineShowing + 1) * font.getLineHeight(),
-				cursorPatch.getMinWidth(), font.getLineHeight());
+			y - font.getDescent() / 2 - (cursorLine - firstLineShowing + 1) * font.getLineHeight(), cursorPatch.getMinWidth(),
+			font.getLineHeight());
 	}
 
 	@Override
-	protected void calculateOffsets() {
+	protected void calculateOffsets () {
 		super.calculateOffsets();
 		if (!this.text.equals(lastText)) {
 			this.lastText = text;
 			BitmapFont font = style.font;
-			float maxWidthLine = this.getWidth() - (style.background != null
-					? style.background.getLeftWidth() + style.background.getRightWidth() : 0);
+			float maxWidthLine = this.getWidth()
+				- (style.background != null ? style.background.getLeftWidth() + style.background.getRightWidth() : 0);
 			linesBreak.clear();
 			int lineStart = 0;
 			int lastSpace = 0;
@@ -319,22 +303,22 @@ public class TextArea extends TextField {
 	}
 
 	@Override
-	protected InputListener createInputListener() {
+	protected InputListener createInputListener () {
 		return new TextAreaListener();
 	}
 
 	@Override
-	public void setSelection(int selectionStart, int selectionEnd) {
+	public void setSelection (int selectionStart, int selectionEnd) {
 		super.setSelection(selectionStart, selectionEnd);
 		updateCurrentLine();
 	}
 
 	@Override
-	protected void moveCursor(boolean forward, boolean jump) {
+	protected void moveCursor (boolean forward, boolean jump) {
 		int count = forward ? 1 : -1;
 		int index = (cursorLine * 2) + count;
 		if (index >= 0 && index + 1 < linesBreak.size && linesBreak.items[index] == cursor
-				&& linesBreak.items[index + 1] == cursor) {
+			&& linesBreak.items[index + 1] == cursor) {
 			cursorLine += count;
 			if (jump) {
 				super.moveCursor(forward, jump);
@@ -348,29 +332,29 @@ public class TextArea extends TextField {
 	}
 
 	@Override
-	protected boolean continueCursor(int index, int offset) {
+	protected boolean continueCursor (int index, int offset) {
 		int pos = calculateCurrentLineIndex(index + offset);
-		return super.continueCursor(index, offset) && (pos < 0 || pos >= linesBreak.size - 2
-				|| (linesBreak.items[pos + 1] != index) || (linesBreak.items[pos + 1] == linesBreak.items[pos + 2]));
+		return super.continueCursor(index, offset) && (pos < 0 || pos >= linesBreak.size - 2 || (linesBreak.items[pos + 1] != index)
+			|| (linesBreak.items[pos + 1] == linesBreak.items[pos + 2]));
 	}
 
-	public int getCursorLine() {
+	public int getCursorLine () {
 		return cursorLine;
 	}
 
-	public int getFirstLineShowing() {
+	public int getFirstLineShowing () {
 		return firstLineShowing;
 	}
 
-	public int getLinesShowing() {
+	public int getLinesShowing () {
 		return linesShowing;
 	}
 
-	public float getCursorX() {
+	public float getCursorX () {
 		return textOffset + fontOffset + style.font.getData().cursorX;
 	}
 
-	public float getCursorY() {
+	public float getCursorY () {
 		BitmapFont font = style.font;
 		return -(-font.getDescent() / 2 - (cursorLine - firstLineShowing + 1) * font.getLineHeight());
 	}
@@ -379,7 +363,7 @@ public class TextArea extends TextField {
 	public class TextAreaListener extends TextFieldClickListener {
 
 		@Override
-		protected void setCursorPosition(float x, float y) {
+		protected void setCursorPosition (float x, float y) {
 			moveOffset = -1;
 
 			Drawable background = style.background;
@@ -396,7 +380,7 @@ public class TextArea extends TextField {
 				y -= background.getTopHeight();
 			}
 
-			cursorLine = (int) Math.floor((height - y) / font.getLineHeight()) + firstLineShowing;
+			cursorLine = (int)Math.floor((height - y) / font.getLineHeight()) + firstLineShowing;
 			cursorLine = Math.max(0, Math.min(cursorLine, getLines() - 1));
 
 			super.setCursorPosition(x, y);
@@ -404,13 +388,12 @@ public class TextArea extends TextField {
 		}
 
 		@Override
-		public boolean keyDown(InputEvent event, int keycode) {
+		public boolean keyDown (InputEvent event, int keycode) {
 			boolean result = super.keyDown(event, keycode);
 			Stage stage = getStage();
 			if (stage != null && stage.getKeyboardFocus() == TextArea.this) {
 				boolean repeat = false;
-				boolean shift = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)
-						|| Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT);
+				boolean shift = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT);
 				if (keycode == Input.Keys.DOWN) {
 					if (shift) {
 						if (!hasSelection) {
@@ -448,14 +431,14 @@ public class TextArea extends TextField {
 		}
 
 		@Override
-		public boolean keyTyped(InputEvent event, char character) {
+		public boolean keyTyped (InputEvent event, char character) {
 			boolean result = super.keyTyped(event, character);
 			showCursor();
 			return result;
 		}
 
 		@Override
-		protected void goHome(boolean jump) {
+		protected void goHome (boolean jump) {
 			if (jump) {
 				cursor = 0;
 			} else if (cursorLine * 2 < linesBreak.size) {
@@ -464,7 +447,7 @@ public class TextArea extends TextField {
 		}
 
 		@Override
-		protected void goEnd(boolean jump) {
+		protected void goEnd (boolean jump) {
 			if (jump || cursorLine >= getLines()) {
 				cursor = text.length();
 			} else if (cursorLine * 2 + 1 < linesBreak.size) {

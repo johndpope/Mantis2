@@ -26,14 +26,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.StringBuilder;
 
-/**
- * A text label, with optional word wrapping.
+/** A text label, with optional word wrapping.
  * <p>
- * The preferred size of the label is determined by the actual text bounds,
- * unless {@link #setWrap(boolean) word wrap} is enabled.
- * 
- * @author Nathan Sweet
- */
+ * The preferred size of the label is determined by the actual text bounds, unless {@link #setWrap(boolean) word wrap} is enabled.
+ * @author Nathan Sweet */
 public class Label extends Widget {
 	static private final Color tempColor = new Color();
 	static private final GlyphLayout prefSizeLayout = new GlyphLayout();
@@ -52,129 +48,107 @@ public class Label extends Widget {
 	private boolean fontScaleChanged = false;
 	private String ellipsis;
 
-	public Label(CharSequence text, Skin skin) {
+	public Label (CharSequence text, Skin skin) {
 		this(text, skin.get(LabelStyle.class));
 	}
 
-	public Label(CharSequence text, Skin skin, String styleName) {
+	public Label (CharSequence text, Skin skin, String styleName) {
 		this(text, skin.get(styleName, LabelStyle.class));
 	}
 
-	/**
-	 * Creates a label, using a {@link LabelStyle} that has a BitmapFont with
-	 * the specified name from the skin and the specified color.
-	 */
-	public Label(CharSequence text, Skin skin, String fontName, Color color) {
+	/** Creates a label, using a {@link LabelStyle} that has a BitmapFont with the specified name from the skin and the specified
+	 * color. */
+	public Label (CharSequence text, Skin skin, String fontName, Color color) {
 		this(text, new LabelStyle(skin.getFont(fontName), color));
 	}
 
-	/**
-	 * Creates a label, using a {@link LabelStyle} that has a BitmapFont with
-	 * the specified name and the specified color from the skin.
-	 */
-	public Label(CharSequence text, Skin skin, String fontName, String colorName) {
+	/** Creates a label, using a {@link LabelStyle} that has a BitmapFont with the specified name and the specified color from the
+	 * skin. */
+	public Label (CharSequence text, Skin skin, String fontName, String colorName) {
 		this(text, new LabelStyle(skin.getFont(fontName), skin.getColor(colorName)));
 	}
 
-	public Label(CharSequence text, LabelStyle style) {
-		if (text != null)
-			this.text.append(text);
+	public Label (CharSequence text, LabelStyle style) {
+		if (text != null) this.text.append(text);
 		setStyle(style);
-		if (text != null && text.length() > 0)
-			setSize(getPrefWidth(), getPrefHeight());
+		if (text != null && text.length() > 0) setSize(getPrefWidth(), getPrefHeight());
 	}
 
-	public void setStyle(LabelStyle style) {
-		if (style == null)
-			throw new IllegalArgumentException("style cannot be null.");
-		if (style.font == null)
-			throw new IllegalArgumentException("Missing LabelStyle font.");
+	public void setStyle (LabelStyle style) {
+		if (style == null) throw new IllegalArgumentException("style cannot be null.");
+		if (style.font == null) throw new IllegalArgumentException("Missing LabelStyle font.");
 		this.style = style;
 		cache = style.font.newFontCache();
 		invalidateHierarchy();
 	}
 
-	/**
-	 * Returns the label's style. Modifying the returned style may not have an
-	 * effect until {@link #setStyle(LabelStyle)} is called.
-	 */
-	public LabelStyle getStyle() {
+	/** Returns the label's style. Modifying the returned style may not have an effect until {@link #setStyle(LabelStyle)} is
+	 * called. */
+	public LabelStyle getStyle () {
 		return style;
 	}
 
-	/**
-	 * @param newText
-	 *            May be null, "" will be used.
-	 */
-	public void setText(CharSequence newText) {
-		if (newText == null)
-			newText = "";
+	/** @param newText May be null, "" will be used. */
+	public void setText (CharSequence newText) {
+		if (newText == null) newText = "";
 		if (newText instanceof StringBuilder) {
-			if (text.equals(newText))
-				return;
+			if (text.equals(newText)) return;
 			text.setLength(0);
-			text.append((StringBuilder) newText);
+			text.append((StringBuilder)newText);
 		} else {
-			if (textEquals(newText))
-				return;
+			if (textEquals(newText)) return;
 			text.setLength(0);
 			text.append(newText);
 		}
 		invalidateHierarchy();
 	}
 
-	public boolean textEquals(CharSequence other) {
+	public boolean textEquals (CharSequence other) {
 		int length = text.length;
 		char[] chars = text.chars;
-		if (length != other.length())
-			return false;
+		if (length != other.length()) return false;
 		for (int i = 0; i < length; i++)
-			if (chars[i] != other.charAt(i))
-				return false;
+			if (chars[i] != other.charAt(i)) return false;
 		return true;
 	}
 
-	public StringBuilder getText() {
+	public StringBuilder getText () {
 		return text;
 	}
 
-	public void invalidate() {
+	public void invalidate () {
 		super.invalidate();
 		prefSizeInvalid = true;
 	}
 
-	private void scaleAndComputePrefSize() {
+	private void scaleAndComputePrefSize () {
 		BitmapFont font = cache.getFont();
 		float oldScaleX = font.getScaleX();
 		float oldScaleY = font.getScaleY();
-		if (fontScaleChanged)
-			font.getData().setScale(fontScaleX, fontScaleY);
+		if (fontScaleChanged) font.getData().setScale(fontScaleX, fontScaleY);
 
 		computePrefSize();
 
-		if (fontScaleChanged)
-			font.getData().setScale(oldScaleX, oldScaleY);
+		if (fontScaleChanged) font.getData().setScale(oldScaleX, oldScaleY);
 	}
 
-	private void computePrefSize() {
+	private void computePrefSize () {
 		prefSizeInvalid = false;
 		GlyphLayout prefSizeLayout = Label.prefSizeLayout;
 		if (wrap && ellipsis == null) {
 			float width = getWidth();
-			if (style.background != null)
-				width -= style.background.getLeftWidth() + style.background.getRightWidth();
+			if (style.background != null) width -= style.background.getLeftWidth() + style.background.getRightWidth();
 			prefSizeLayout.setText(cache.getFont(), text, Color.WHITE, width, Align.left, true);
 		} else
 			prefSizeLayout.setText(cache.getFont(), text);
 		prefSize.set(prefSizeLayout.width, prefSizeLayout.height);
 	}
 
-	public void layout() {
+	public void layout () {
 		BitmapFont font = cache.getFont();
 		float oldScaleX = font.getScaleX();
 		float oldScaleY = font.getScaleY();
-		if (fontScaleChanged)
-			font.getData().setScale(fontScaleX, fontScaleY);
+		if (fontScaleChanged) font.getData().setScale(fontScaleX, fontScaleY);
 
 		boolean wrap = this.wrap && ellipsis == null;
 		if (wrap) {
@@ -198,8 +172,7 @@ public class Label extends Widget {
 		GlyphLayout layout = this.layout;
 		float textWidth, textHeight;
 		if (wrap || text.indexOf("\n") != -1) {
-			// If the text can span multiple lines, determine the text's actual
-			// size so it can be aligned within the label.
+			// If the text can span multiple lines, determine the text's actual size so it can be aligned within the label.
 			layout.setText(font, text, 0, text.length, Color.WHITE, width, lineAlign, wrap, ellipsis);
 			textWidth = layout.width;
 			textHeight = layout.height;
@@ -224,17 +197,15 @@ public class Label extends Widget {
 		} else {
 			y += (height - textHeight) / 2;
 		}
-		if (!cache.getFont().isFlipped())
-			y += textHeight;
+		if (!cache.getFont().isFlipped()) y += textHeight;
 
 		layout.setText(font, text, 0, text.length, Color.WHITE, textWidth, lineAlign, wrap, ellipsis);
 		cache.setText(layout, x, y);
 
-		if (fontScaleChanged)
-			font.getData().setScale(oldScaleX, oldScaleY);
+		if (fontScaleChanged) font.getData().setScale(oldScaleX, oldScaleY);
 	}
 
-	public void draw(Batch batch, float parentAlpha) {
+	public void draw (Batch batch, float parentAlpha) {
 		validate();
 		Color color = tempColor.set(getColor());
 		color.a *= parentAlpha;
@@ -242,83 +213,64 @@ public class Label extends Widget {
 			batch.setColor(color.r, color.g, color.b, color.a);
 			style.background.draw(batch, getX(), getY(), getWidth(), getHeight());
 		}
-		if (style.fontColor != null)
-			color.mul(style.fontColor);
+		if (style.fontColor != null) color.mul(style.fontColor);
 		cache.tint(color);
 		cache.setPosition(getX(), getY());
 		cache.draw(batch);
 	}
 
-	public float getPrefWidth() {
-		if (wrap)
-			return 0;
-		if (prefSizeInvalid)
-			scaleAndComputePrefSize();
+	public float getPrefWidth () {
+		if (wrap) return 0;
+		if (prefSizeInvalid) scaleAndComputePrefSize();
 		float width = prefSize.x;
 		Drawable background = style.background;
-		if (background != null)
-			width += background.getLeftWidth() + background.getRightWidth();
+		if (background != null) width += background.getLeftWidth() + background.getRightWidth();
 		return width;
 	}
 
-	public float getPrefHeight() {
-		if (prefSizeInvalid)
-			scaleAndComputePrefSize();
+	public float getPrefHeight () {
+		if (prefSizeInvalid) scaleAndComputePrefSize();
 		float height = prefSize.y - style.font.getDescent() * fontScaleY * 2;
 		Drawable background = style.background;
-		if (background != null)
-			height += background.getTopHeight() + background.getBottomHeight();
+		if (background != null) height += background.getTopHeight() + background.getBottomHeight();
 		return height;
 	}
 
-	public GlyphLayout getGlyphLayout() {
+	public GlyphLayout getGlyphLayout () {
 		return layout;
 	}
 
-	/**
-	 * If false, the text will only wrap where it contains newlines (\n). The
-	 * preferred size of the label will be the text bounds. If true, the text
-	 * will word wrap using the width of the label. The preferred width of the
-	 * label will be 0, it is expected that something external will set the
-	 * width of the label. Wrapping will not occur when ellipsis is enabled.
-	 * Default is false.
+	/** If false, the text will only wrap where it contains newlines (\n). The preferred size of the label will be the text bounds.
+	 * If true, the text will word wrap using the width of the label. The preferred width of the label will be 0, it is expected
+	 * that something external will set the width of the label. Wrapping will not occur when ellipsis is enabled. Default is false.
 	 * <p>
-	 * When wrap is enabled, the label's preferred height depends on the width
-	 * of the label. In some cases the parent of the label will need to layout
-	 * twice: once to set the width of the label and a second time to adjust to
-	 * the label's new preferred height.
-	 */
-	public void setWrap(boolean wrap) {
+	 * When wrap is enabled, the label's preferred height depends on the width of the label. In some cases the parent of the label
+	 * will need to layout twice: once to set the width of the label and a second time to adjust to the label's new preferred
+	 * height. */
+	public void setWrap (boolean wrap) {
 		this.wrap = wrap;
 		invalidateHierarchy();
 	}
 
-	public int getLabelAlign() {
+	public int getLabelAlign () {
 		return labelAlign;
 	}
 
-	public int getLineAlign() {
+	public int getLineAlign () {
 		return lineAlign;
 	}
 
-	/**
-	 * @param alignment
-	 *            Aligns all the text within the label (default left center) and
-	 *            each line of text horizontally (default left).
-	 * @see Align
-	 */
-	public void setAlignment(int alignment) {
+	/** @param alignment Aligns all the text within the label (default left center) and each line of text horizontally (default
+	 *           left).
+	 * @see Align */
+	public void setAlignment (int alignment) {
 		setAlignment(alignment, alignment);
 	}
 
-	/**
-	 * @param labelAlign
-	 *            Aligns all the text within the label (default left center).
-	 * @param lineAlign
-	 *            Aligns each line of text horizontally (default left).
-	 * @see Align
-	 */
-	public void setAlignment(int labelAlign, int lineAlign) {
+	/** @param labelAlign Aligns all the text within the label (default left center).
+	 * @param lineAlign Aligns each line of text horizontally (default left).
+	 * @see Align */
+	public void setAlignment (int labelAlign, int lineAlign) {
 		this.labelAlign = labelAlign;
 
 		if ((lineAlign & Align.left) != 0)
@@ -331,48 +283,42 @@ public class Label extends Widget {
 		invalidate();
 	}
 
-	public void setFontScale(float fontScale) {
+	public void setFontScale (float fontScale) {
 		setFontScale(fontScale, fontScale);
 	}
 
-	public void setFontScale(float fontScaleX, float fontScaleY) {
+	public void setFontScale (float fontScaleX, float fontScaleY) {
 		fontScaleChanged = true;
 		this.fontScaleX = fontScaleX;
 		this.fontScaleY = fontScaleY;
 		invalidateHierarchy();
 	}
 
-	public float getFontScaleX() {
+	public float getFontScaleX () {
 		return fontScaleX;
 	}
 
-	public void setFontScaleX(float fontScaleX) {
+	public void setFontScaleX (float fontScaleX) {
 		setFontScale(fontScaleX, fontScaleY);
 	}
 
-	public float getFontScaleY() {
+	public float getFontScaleY () {
 		return fontScaleY;
 	}
 
-	public void setFontScaleY(float fontScaleY) {
+	public void setFontScaleY (float fontScaleY) {
 		setFontScale(fontScaleX, fontScaleY);
 	}
 
-	/**
-	 * When non-null the text will be truncated "..." if it does not fit within
-	 * the width of the label. Wrapping will not occur when ellipsis is enabled.
-	 * Default is false.
-	 */
-	public void setEllipsis(String ellipsis) {
+	/** When non-null the text will be truncated "..." if it does not fit within the width of the label. Wrapping will not occur
+	 * when ellipsis is enabled. Default is false. */
+	public void setEllipsis (String ellipsis) {
 		this.ellipsis = ellipsis;
 	}
 
-	/**
-	 * When true the text will be truncated "..." if it does not fit within the
-	 * width of the label. Wrapping will not occur when ellipsis is true.
-	 * Default is false.
-	 */
-	public void setEllipsis(boolean ellipsis) {
+	/** When true the text will be truncated "..." if it does not fit within the width of the label. Wrapping will not occur when
+	 * ellipsis is true. Default is false. */
+	public void setEllipsis (boolean ellipsis) {
 		if (ellipsis)
 			this.ellipsis = "...";
 		else
@@ -380,19 +326,16 @@ public class Label extends Widget {
 	}
 
 	/** Allows subclasses to access the cache in {@link #draw(Batch, float)}. */
-	protected BitmapFontCache getBitmapFontCache() {
+	protected BitmapFontCache getBitmapFontCache () {
 		return cache;
 	}
 
-	public String toString() {
+	public String toString () {
 		return super.toString() + ": " + text;
 	}
 
-	/**
-	 * The style for a label, see {@link Label}.
-	 * 
-	 * @author Nathan Sweet
-	 */
+	/** The style for a label, see {@link Label}.
+	 * @author Nathan Sweet */
 	static public class LabelStyle {
 		public BitmapFont font;
 		/** Optional. */
@@ -400,18 +343,17 @@ public class Label extends Widget {
 		/** Optional. */
 		public Drawable background;
 
-		public LabelStyle() {
+		public LabelStyle () {
 		}
 
-		public LabelStyle(BitmapFont font, Color fontColor) {
+		public LabelStyle (BitmapFont font, Color fontColor) {
 			this.font = font;
 			this.fontColor = fontColor;
 		}
 
-		public LabelStyle(LabelStyle style) {
+		public LabelStyle (LabelStyle style) {
 			this.font = style.font;
-			if (style.fontColor != null)
-				fontColor = new Color(style.fontColor);
+			if (style.fontColor != null) fontColor = new Color(style.fontColor);
 			background = style.background;
 		}
 	}

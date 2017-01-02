@@ -19,17 +19,14 @@ package com.badlogic.gdx.scenes.scene2d.actions;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.utils.Pool;
 
-/**
- * An action that runs a {@link Runnable}. Alternatively, the {@link #run()}
- * method can be overridden instead of setting a runnable.
- * 
- * @author Nathan Sweet
- */
+/** An action that runs a {@link Runnable}. Alternatively, the {@link #run()} method can be overridden instead of setting a
+ * runnable.
+ * @author Nathan Sweet */
 public class RunnableAction extends Action {
 	private Runnable runnable;
 	private boolean ran;
 
-	public boolean act(float delta) {
+	public boolean act (float delta) {
 		if (!ran) {
 			ran = true;
 			run();
@@ -38,10 +35,9 @@ public class RunnableAction extends Action {
 	}
 
 	/** Called to run the runnable. */
-	public void run() {
+	public void run () {
 		Pool pool = getPool();
-		setPool(null); // Ensure this action can't be returned to the pool
-						// inside the runnable.
+		setPool(null); // Ensure this action can't be returned to the pool inside the runnable.
 		try {
 			runnable.run();
 		} finally {
@@ -49,20 +45,20 @@ public class RunnableAction extends Action {
 		}
 	}
 
-	public void restart() {
+	public void restart () {
 		ran = false;
 	}
 
-	public void reset() {
+	public void reset () {
 		super.reset();
 		runnable = null;
 	}
 
-	public Runnable getRunnable() {
+	public Runnable getRunnable () {
 		return runnable;
 	}
 
-	public void setRunnable(Runnable runnable) {
+	public void setRunnable (Runnable runnable) {
 		this.runnable = runnable;
 	}
 }

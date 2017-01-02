@@ -22,12 +22,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 
-/**
- * Causes a scroll pane to scroll when a drag goes outside the bounds of the
- * scroll pane.
- * 
- * @author Nathan Sweet
- */
+/** Causes a scroll pane to scroll when a drag goes outside the bounds of the scroll pane.
+ * @author Nathan Sweet */
 public class DragScrollListener extends DragListener {
 	private ScrollPane scroll;
 	private Task scrollUp, scrollDown;
@@ -35,34 +31,33 @@ public class DragScrollListener extends DragListener {
 	float minSpeed = 15, maxSpeed = 75, tickSecs = 0.05f;
 	long startTime, rampTime = 1750;
 
-	public DragScrollListener(final ScrollPane scroll) {
+	public DragScrollListener (final ScrollPane scroll) {
 		this.scroll = scroll;
 
 		scrollUp = new Task() {
-			public void run() {
+			public void run () {
 				scroll.setScrollY(scroll.getScrollY() - getScrollPixels());
 			}
 		};
 		scrollDown = new Task() {
-			public void run() {
+			public void run () {
 				scroll.setScrollY(scroll.getScrollY() + getScrollPixels());
 			}
 		};
 	}
 
-	public void setup(float minSpeedPixels, float maxSpeedPixels, float tickSecs, float rampSecs) {
+	public void setup (float minSpeedPixels, float maxSpeedPixels, float tickSecs, float rampSecs) {
 		this.minSpeed = minSpeedPixels;
 		this.maxSpeed = maxSpeedPixels;
 		this.tickSecs = tickSecs;
-		rampTime = (long) (rampSecs * 1000);
+		rampTime = (long)(rampSecs * 1000);
 	}
 
-	float getScrollPixels() {
-		return interpolation.apply(minSpeed, maxSpeed,
-				Math.min(1, (System.currentTimeMillis() - startTime) / (float) rampTime));
+	float getScrollPixels () {
+		return interpolation.apply(minSpeed, maxSpeed, Math.min(1, (System.currentTimeMillis() - startTime) / (float)rampTime));
 	}
 
-	public void drag(InputEvent event, float x, float y, int pointer) {
+	public void drag (InputEvent event, float x, float y, int pointer) {
 		if (x >= 0 && x < scroll.getWidth()) {
 			if (y >= scroll.getHeight()) {
 				scrollDown.cancel();
@@ -84,7 +79,7 @@ public class DragScrollListener extends DragListener {
 		scrollDown.cancel();
 	}
 
-	public void dragStop(InputEvent event, float x, float y, int pointer) {
+	public void dragStop (InputEvent event, float x, float y, int pointer) {
 		scrollUp.cancel();
 		scrollDown.cancel();
 	}

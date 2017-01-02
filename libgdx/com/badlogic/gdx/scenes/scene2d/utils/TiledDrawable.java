@@ -21,34 +21,30 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-/**
- * Draws a {@link TextureRegion} repeatedly to fill the area, instead of
- * stretching it.
- * 
- * @author Nathan Sweet
- */
+/** Draws a {@link TextureRegion} repeatedly to fill the area, instead of stretching it.
+ * @author Nathan Sweet */
 public class TiledDrawable extends TextureRegionDrawable {
 	private final Color color = new Color(1, 1, 1, 1);
 
-	public TiledDrawable() {
+	public TiledDrawable () {
 		super();
 	}
 
-	public TiledDrawable(TextureRegion region) {
+	public TiledDrawable (TextureRegion region) {
 		super(region);
 	}
 
-	public TiledDrawable(TextureRegionDrawable drawable) {
+	public TiledDrawable (TextureRegionDrawable drawable) {
 		super(drawable);
 	}
 
-	public void draw(Batch batch, float x, float y, float width, float height) {
+	public void draw (Batch batch, float x, float y, float width, float height) {
 		float batchColor = batch.getPackedColor();
 		batch.setColor(batch.getColor().mul(color));
 
 		TextureRegion region = getRegion();
 		float regionWidth = region.getRegionWidth(), regionHeight = region.getRegionHeight();
-		int fullX = (int) (width / regionWidth), fullY = (int) (height / regionHeight);
+		int fullX = (int)(width / regionWidth), fullY = (int)(height / regionHeight);
 		float remainingX = width - regionWidth * fullX, remainingY = height - regionHeight * fullY;
 		float startX = x, startY = y;
 		float endX = x + width - remainingX, endY = y + height - remainingY;
@@ -92,16 +88,16 @@ public class TiledDrawable extends TextureRegionDrawable {
 		batch.setColor(batchColor);
 	}
 
-	public void draw(Batch batch, float x, float y, float originX, float originY, float width, float height,
-			float scaleX, float scaleY, float rotation) {
+	public void draw (Batch batch, float x, float y, float originX, float originY, float width, float height, float scaleX,
+		float scaleY, float rotation) {
 		throw new UnsupportedOperationException();
 	}
 
-	public Color getColor() {
+	public Color getColor () {
 		return color;
 	}
 
-	public TiledDrawable tint(Color tint) {
+	public TiledDrawable tint (Color tint) {
 		TiledDrawable drawable = new TiledDrawable(this);
 		drawable.color.set(tint);
 		drawable.setLeftWidth(getLeftWidth());

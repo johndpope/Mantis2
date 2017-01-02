@@ -17,34 +17,31 @@
 package com.badlogic.gdx.scenes.scene2d.actions;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 
-/**
- * Adds an action to an actor.
- * 
- * @author Nathan Sweet
- */
+/** Adds an action to an actor.
+ * @author Nathan Sweet */
 public class AddAction extends Action {
 	private Action action;
 
-	public boolean act(float delta) {
+	public boolean act (float delta) {
 		target.addAction(action);
 		return true;
 	}
 
-	public Action getAction() {
+	public Action getAction () {
 		return action;
 	}
 
-	public void setAction(Action action) {
+	public void setAction (Action action) {
 		this.action = action;
 	}
 
-	public void restart() {
-		if (action != null)
-			action.restart();
+	public void restart () {
+		if (action != null) action.restart();
 	}
 
-	public void reset() {
+	public void reset () {
 		super.reset();
 		action = null;
 	}

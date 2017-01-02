@@ -17,16 +17,14 @@
 package com.badlogic.gdx.scenes.scene2d.actions;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 
-/**
- * Removes an actor from the stage.
- * 
- * @author Nathan Sweet
- */
+/** Removes an actor from the stage.
+ * @author Nathan Sweet */
 public class RemoveActorAction extends Action {
 	private boolean removed;
 
-	public boolean act(float delta) {
+	public boolean act (float delta) {
 		if (!removed) {
 			removed = true;
 			target.remove();
@@ -34,7 +32,7 @@ public class RemoveActorAction extends Action {
 		return true;
 	}
 
-	public void restart() {
+	public void restart () {
 		removed = false;
 	}
 }

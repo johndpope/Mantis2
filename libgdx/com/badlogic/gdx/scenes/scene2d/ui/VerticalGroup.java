@@ -25,22 +25,16 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.SnapshotArray;
 
-/**
- * A group that lays out its children top to bottom vertically, with optional
- * wrapping. This can be easier than using {@link Table} when actors need to be
- * inserted into or removed from the middle of the group.
+/** A group that lays out its children top to bottom vertically, with optional wrapping. This can be easier than using
+ * {@link Table} when actors need to be inserted into or removed from the middle of the group.
  * <p>
- * The preferred width is the largest preferred width of any child. The
- * preferred height is the sum of the children's preferred heights plus spacing.
- * The preferred size is slightly different when {@link #wrap() wrap} is
- * enabled. The min size is the preferred size and the max size is 0.
+ * The preferred width is the largest preferred width of any child. The preferred height is the sum of the children's preferred
+ * heights plus spacing. The preferred size is slightly different when {@link #wrap() wrap} is enabled. The min size is the
+ * preferred size and the max size is 0.
  * <p>
- * Widgets are sized using their {@link Layout#getPrefWidth() preferred height},
- * so widgets which return 0 as their preferred height will be given a height of
- * 0.
- * 
- * @author Nathan Sweet
- */
+ * Widgets are sized using their {@link Layout#getPrefWidth() preferred height}, so widgets which return 0 as their preferred
+ * height will be given a height of 0.
+ * @author Nathan Sweet */
 public class VerticalGroup extends WidgetGroup {
 	private float prefWidth, prefHeight, lastPrefWidth;
 	private boolean sizeInvalid = true;
@@ -50,16 +44,16 @@ public class VerticalGroup extends WidgetGroup {
 	private boolean reverse, round = true, wrap, expand;
 	private float space, wrapSpace, fill, padTop, padLeft, padBottom, padRight;
 
-	public VerticalGroup() {
+	public VerticalGroup () {
 		setTouchable(Touchable.childrenOnly);
 	}
 
-	public void invalidate() {
+	public void invalidate () {
 		super.invalidate();
 		sizeInvalid = true;
 	}
 
-	private void computeSize() {
+	private void computeSize () {
 		sizeInvalid = false;
 		SnapshotArray<Actor> children = getChildren();
 		int n = children.size;
@@ -84,7 +78,7 @@ public class VerticalGroup extends WidgetGroup {
 
 				float width, height;
 				if (child instanceof Layout) {
-					Layout layout = (Layout) child;
+					Layout layout = (Layout)child;
 					width = layout.getPrefWidth();
 					height = layout.getPrefHeight();
 				} else {
@@ -97,8 +91,7 @@ public class VerticalGroup extends WidgetGroup {
 					columnSizes.add(y);
 					columnSizes.add(columnWidth);
 					prefHeight = Math.max(prefHeight, y + pad);
-					if (x > 0)
-						x += wrapSpace;
+					if (x > 0) x += wrapSpace;
 					x += columnWidth;
 					columnWidth = 0;
 					y = 0;
@@ -110,15 +103,14 @@ public class VerticalGroup extends WidgetGroup {
 			columnSizes.add(y);
 			columnSizes.add(columnWidth);
 			prefHeight = Math.max(prefHeight, y + pad);
-			if (x > 0)
-				x += wrapSpace;
+			if (x > 0) x += wrapSpace;
 			prefWidth = Math.max(prefWidth, x + columnWidth);
 		} else {
 			prefHeight = padTop + padBottom + space * (n - 1);
 			for (int i = 0; i < n; i++) {
 				Actor child = children.get(i);
 				if (child instanceof Layout) {
-					Layout layout = (Layout) child;
+					Layout layout = (Layout)child;
 					prefWidth = Math.max(prefWidth, layout.getPrefWidth());
 					prefHeight += layout.getPrefHeight();
 				} else {
@@ -134,9 +126,8 @@ public class VerticalGroup extends WidgetGroup {
 		}
 	}
 
-	public void layout() {
-		if (sizeInvalid)
-			computeSize();
+	public void layout () {
+		if (sizeInvalid) computeSize();
 
 		if (wrap) {
 			layoutWrapped();
@@ -176,7 +167,7 @@ public class VerticalGroup extends WidgetGroup {
 			float width, height;
 			Layout layout = null;
 			if (child instanceof Layout) {
-				layout = (Layout) child;
+				layout = (Layout)child;
 				width = layout.getPrefWidth();
 				height = layout.getPrefHeight();
 			} else {
@@ -184,14 +175,12 @@ public class VerticalGroup extends WidgetGroup {
 				height = child.getHeight();
 			}
 
-			if (fill > 0)
-				width = columnWidth * fill;
+			if (fill > 0) width = columnWidth * fill;
 
 			if (layout != null) {
 				width = Math.max(width, layout.getMinWidth());
 				float maxWidth = layout.getMaxWidth();
-				if (maxWidth > 0 && width > maxWidth)
-					width = maxWidth;
+				if (maxWidth > 0 && width > maxWidth) width = maxWidth;
 			}
 
 			float x = startX;
@@ -206,12 +195,11 @@ public class VerticalGroup extends WidgetGroup {
 			else
 				child.setBounds(x, y, width, height);
 
-			if (layout != null)
-				layout.validate();
+			if (layout != null) layout.validate();
 		}
 	}
 
-	private void layoutWrapped() {
+	private void layoutWrapped () {
 		float prefWidth = getPrefWidth();
 		if (prefWidth != lastPrefWidth) {
 			lastPrefWidth = prefWidth;
@@ -252,7 +240,7 @@ public class VerticalGroup extends WidgetGroup {
 			float width, height;
 			Layout layout = null;
 			if (child instanceof Layout) {
-				layout = (Layout) child;
+				layout = (Layout)child;
 				width = layout.getPrefWidth();
 				height = layout.getPrefHeight();
 			} else {
@@ -274,14 +262,12 @@ public class VerticalGroup extends WidgetGroup {
 				r += 2;
 			}
 
-			if (fill > 0)
-				width = columnWidth * fill;
+			if (fill > 0) width = columnWidth * fill;
 
 			if (layout != null) {
 				width = Math.max(width, layout.getMinWidth());
 				float maxWidth = layout.getMaxWidth();
-				if (maxWidth > 0 && width > maxWidth)
-					width = maxWidth;
+				if (maxWidth > 0 && width > maxWidth) width = maxWidth;
 			}
 
 			float x = columnX;
@@ -296,70 +282,64 @@ public class VerticalGroup extends WidgetGroup {
 			else
 				child.setBounds(x, y, width, height);
 
-			if (layout != null)
-				layout.validate();
+			if (layout != null) layout.validate();
 		}
 	}
 
-	public float getPrefWidth() {
-		if (sizeInvalid)
-			computeSize();
+	public float getPrefWidth () {
+		if (sizeInvalid) computeSize();
 		return prefWidth;
 	}
 
-	public float getPrefHeight() {
-		if (wrap)
-			return 0;
-		if (sizeInvalid)
-			computeSize();
+	public float getPrefHeight () {
+		if (wrap) return 0;
+		if (sizeInvalid) computeSize();
 		return prefHeight;
 	}
 
 	/** If true (the default), positions and sizes are rounded to integers. */
-	public void setRound(boolean round) {
+	public void setRound (boolean round) {
 		this.round = round;
 	}
 
 	/** The children will be displayed last to first. */
-	public VerticalGroup reverse() {
+	public VerticalGroup reverse () {
 		this.reverse = true;
 		return this;
 	}
 
 	/** If true, the children will be displayed last to first. */
-	public VerticalGroup reverse(boolean reverse) {
+	public VerticalGroup reverse (boolean reverse) {
 		this.reverse = reverse;
 		return this;
 	}
 
-	public boolean getReverse() {
+	public boolean getReverse () {
 		return reverse;
 	}
 
 	/** Sets the vertical space between children. */
-	public VerticalGroup space(float space) {
+	public VerticalGroup space (float space) {
 		this.space = space;
 		return this;
 	}
 
-	public float getSpace() {
+	public float getSpace () {
 		return space;
 	}
 
 	/** Sets the horizontal space between columns when wrap is enabled. */
-	public VerticalGroup wrapSpace(float wrapSpace) {
+	public VerticalGroup wrapSpace (float wrapSpace) {
 		this.wrapSpace = wrapSpace;
 		return this;
 	}
 
-	public float getWrapSpace() {
+	public float getWrapSpace () {
 		return wrapSpace;
 	}
 
-	/**
-	 * Sets the padTop, padLeft, padBottom, and padRight to the specified value.
-	 */
-	public VerticalGroup pad(float pad) {
+	/** Sets the padTop, padLeft, padBottom, and padRight to the specified value. */
+	public VerticalGroup pad (float pad) {
 		padTop = pad;
 		padLeft = pad;
 		padBottom = pad;
@@ -367,7 +347,7 @@ public class VerticalGroup extends WidgetGroup {
 		return this;
 	}
 
-	public VerticalGroup pad(float top, float left, float bottom, float right) {
+	public VerticalGroup pad (float top, float left, float bottom, float right) {
 		padTop = top;
 		padLeft = left;
 		padBottom = bottom;
@@ -375,219 +355,178 @@ public class VerticalGroup extends WidgetGroup {
 		return this;
 	}
 
-	public VerticalGroup padTop(float padTop) {
+	public VerticalGroup padTop (float padTop) {
 		this.padTop = padTop;
 		return this;
 	}
 
-	public VerticalGroup padLeft(float padLeft) {
+	public VerticalGroup padLeft (float padLeft) {
 		this.padLeft = padLeft;
 		return this;
 	}
 
-	public VerticalGroup padBottom(float padBottom) {
+	public VerticalGroup padBottom (float padBottom) {
 		this.padBottom = padBottom;
 		return this;
 	}
 
-	public VerticalGroup padRight(float padRight) {
+	public VerticalGroup padRight (float padRight) {
 		this.padRight = padRight;
 		return this;
 	}
 
-	public float getPadTop() {
+	public float getPadTop () {
 		return padTop;
 	}
 
-	public float getPadLeft() {
+	public float getPadLeft () {
 		return padLeft;
 	}
 
-	public float getPadBottom() {
+	public float getPadBottom () {
 		return padBottom;
 	}
 
-	public float getPadRight() {
+	public float getPadRight () {
 		return padRight;
 	}
 
-	/**
-	 * Sets the alignment of all widgets within the vertical group. Set to
-	 * {@link Align#center}, {@link Align#top}, {@link Align#bottom},
-	 * {@link Align#left}, {@link Align#right}, or any combination of those.
-	 */
-	public VerticalGroup align(int align) {
+	/** Sets the alignment of all widgets within the vertical group. Set to {@link Align#center}, {@link Align#top},
+	 * {@link Align#bottom}, {@link Align#left}, {@link Align#right}, or any combination of those. */
+	public VerticalGroup align (int align) {
 		this.align = align;
 		return this;
 	}
 
-	/**
-	 * Sets the alignment of all widgets within the vertical group to
-	 * {@link Align#center}. This clears any other alignment.
-	 */
-	public VerticalGroup center() {
+	/** Sets the alignment of all widgets within the vertical group to {@link Align#center}. This clears any other alignment. */
+	public VerticalGroup center () {
 		align = Align.center;
 		return this;
 	}
 
-	/**
-	 * Sets {@link Align#top} and clears {@link Align#bottom} for the alignment
-	 * of all widgets within the vertical group.
-	 */
-	public VerticalGroup top() {
+	/** Sets {@link Align#top} and clears {@link Align#bottom} for the alignment of all widgets within the vertical group. */
+	public VerticalGroup top () {
 		align |= Align.top;
 		align &= ~Align.bottom;
 		return this;
 	}
 
-	/**
-	 * Adds {@link Align#left} and clears {@link Align#right} for the alignment
-	 * of all widgets within the vertical group.
-	 */
-	public VerticalGroup left() {
+	/** Adds {@link Align#left} and clears {@link Align#right} for the alignment of all widgets within the vertical group. */
+	public VerticalGroup left () {
 		align |= Align.left;
 		align &= ~Align.right;
 		return this;
 	}
 
-	/**
-	 * Sets {@link Align#bottom} and clears {@link Align#top} for the alignment
-	 * of all widgets within the vertical group.
-	 */
-	public VerticalGroup bottom() {
+	/** Sets {@link Align#bottom} and clears {@link Align#top} for the alignment of all widgets within the vertical group. */
+	public VerticalGroup bottom () {
 		align |= Align.bottom;
 		align &= ~Align.top;
 		return this;
 	}
 
-	/**
-	 * Adds {@link Align#right} and clears {@link Align#left} for the alignment
-	 * of all widgets within the vertical group.
-	 */
-	public VerticalGroup right() {
+	/** Adds {@link Align#right} and clears {@link Align#left} for the alignment of all widgets within the vertical group. */
+	public VerticalGroup right () {
 		align |= Align.right;
 		align &= ~Align.left;
 		return this;
 	}
 
-	public int getAlign() {
+	public int getAlign () {
 		return align;
 	}
 
-	public VerticalGroup fill() {
+	public VerticalGroup fill () {
 		fill = 1f;
 		return this;
 	}
 
-	/**
-	 * @param fill
-	 *            0 will use preferred height.
-	 */
-	public VerticalGroup fill(float fill) {
+	/** @param fill 0 will use preferred height. */
+	public VerticalGroup fill (float fill) {
 		this.fill = fill;
 		return this;
 	}
 
-	public float getFill() {
+	public float getFill () {
 		return fill;
 	}
 
-	public VerticalGroup expand() {
+	public VerticalGroup expand () {
 		expand = true;
 		return this;
 	}
 
-	/**
-	 * When true and wrap is false, the columns will take up the entire vertical
-	 * group width.
-	 */
-	public VerticalGroup expand(boolean expand) {
+	/** When true and wrap is false, the columns will take up the entire vertical group width. */
+	public VerticalGroup expand (boolean expand) {
 		this.expand = expand;
 		return this;
 	}
 
-	public boolean getExpand() {
+	public boolean getExpand () {
 		return expand;
 	}
 
 	/** Sets fill to 1 and expand to true. */
-	public VerticalGroup grow() {
+	public VerticalGroup grow () {
 		expand = true;
 		fill = 1;
 		return this;
 	}
 
-	/**
-	 * If false, the widgets are arranged in a single column and the preferred
-	 * height is the widget heights plus spacing. If true, the widgets will wrap
-	 * using the height of the vertical group. The preferred height of the group
-	 * will be 0 as it is expected that something external will set the height
-	 * of the group. Default is false.
+	/** If false, the widgets are arranged in a single column and the preferred height is the widget heights plus spacing. If true,
+	 * the widgets will wrap using the height of the vertical group. The preferred height of the group will be 0 as it is expected
+	 * that something external will set the height of the group. Default is false.
 	 * <p>
-	 * When wrap is enabled, the group's preferred width depends on the height
-	 * of the group. In some cases the parent of the group will need to layout
-	 * twice: once to set the height of the group and a second time to adjust to
-	 * the group's new preferred width.
-	 */
-	public VerticalGroup wrap() {
+	 * When wrap is enabled, the group's preferred width depends on the height of the group. In some cases the parent of the group
+	 * will need to layout twice: once to set the height of the group and a second time to adjust to the group's new preferred
+	 * width. */
+	public VerticalGroup wrap () {
 		wrap = true;
 		return this;
 	}
 
-	public VerticalGroup wrap(boolean wrap) {
+	public VerticalGroup wrap (boolean wrap) {
 		this.wrap = wrap;
 		return this;
 	}
 
-	public boolean getWrap() {
+	public boolean getWrap () {
 		return wrap;
 	}
 
-	/**
-	 * Sets the alignment of widgets within each column of the vertical group.
-	 * Set to {@link Align#center}, {@link Align#left}, or {@link Align#right}.
-	 */
-	public VerticalGroup columnAlign(int columnAlign) {
+	/** Sets the alignment of widgets within each column of the vertical group. Set to {@link Align#center}, {@link Align#left}, or
+	 * {@link Align#right}. */
+	public VerticalGroup columnAlign (int columnAlign) {
 		this.columnAlign = columnAlign;
 		return this;
 	}
 
-	/**
-	 * Sets the alignment of widgets within each column to {@link Align#center}.
-	 * This clears any other alignment.
-	 */
-	public VerticalGroup columnCenter() {
+	/** Sets the alignment of widgets within each column to {@link Align#center}. This clears any other alignment. */
+	public VerticalGroup columnCenter () {
 		columnAlign = Align.center;
 		return this;
 	}
 
-	/**
-	 * Adds {@link Align#left} and clears {@link Align#right} for the alignment
-	 * of widgets within each column.
-	 */
-	public VerticalGroup columnLeft() {
+	/** Adds {@link Align#left} and clears {@link Align#right} for the alignment of widgets within each column. */
+	public VerticalGroup columnLeft () {
 		columnAlign |= Align.left;
 		columnAlign &= ~Align.right;
 		return this;
 	}
 
-	/**
-	 * Adds {@link Align#right} and clears {@link Align#left} for the alignment
-	 * of widgets within each column.
-	 */
-	public VerticalGroup columnRight() {
+	/** Adds {@link Align#right} and clears {@link Align#left} for the alignment of widgets within each column. */
+	public VerticalGroup columnRight () {
 		columnAlign |= Align.right;
 		columnAlign &= ~Align.left;
 		return this;
 	}
 
-	protected void drawDebugBounds(ShapeRenderer shapes) {
+	protected void drawDebugBounds (ShapeRenderer shapes) {
 		super.drawDebugBounds(shapes);
-		if (!getDebug())
-			return;
+		if (!getDebug()) return;
 		shapes.set(ShapeType.Line);
 		shapes.setColor(getStage().getDebugColor());
 		shapes.rect(getX() + padLeft, getY() + padBottom, getOriginX(), getOriginY(), getWidth() - padLeft - padRight,
-				getHeight() - padBottom - padTop, getScaleX(), getScaleY(), getRotation());
+			getHeight() - padBottom - padTop, getScaleX(), getScaleY(), getRotation());
 	}
 }

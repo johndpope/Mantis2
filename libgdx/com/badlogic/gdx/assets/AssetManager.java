@@ -26,7 +26,6 @@ import com.badlogic.gdx.assets.loaders.MusicLoader;
 import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
 import com.badlogic.gdx.assets.loaders.PixmapLoader;
 import com.badlogic.gdx.assets.loaders.ShaderProgramLoader;
-import com.badlogic.gdx.assets.loaders.SkinLoader;
 import com.badlogic.gdx.assets.loaders.SoundLoader;
 import com.badlogic.gdx.assets.loaders.TextureAtlasLoader;
 import com.badlogic.gdx.assets.loaders.TextureLoader;
@@ -107,7 +106,6 @@ public class AssetManager implements Disposable {
 			setLoader(Sound.class, new SoundLoader(resolver));
 			setLoader(TextureAtlas.class, new TextureAtlasLoader(resolver));
 			setLoader(Texture.class, new TextureLoader(resolver));
-			setLoader(Skin.class, new SkinLoader(resolver));
 			setLoader(ParticleEffect.class, new ParticleEffectLoader(resolver));
 			setLoader(PolygonRegion.class, new PolygonRegionLoader(resolver));
 			setLoader(ShaderProgram.class, new ShaderProgramLoader(resolver));

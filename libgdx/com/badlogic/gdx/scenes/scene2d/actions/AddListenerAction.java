@@ -17,18 +17,16 @@
 package com.badlogic.gdx.scenes.scene2d.actions;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 
-/**
- * Adds a listener to an actor.
- * 
- * @author Nathan Sweet
- */
+/** Adds a listener to an actor.
+ * @author Nathan Sweet */
 public class AddListenerAction extends Action {
 	private EventListener listener;
 	private boolean capture;
 
-	public boolean act(float delta) {
+	public boolean act (float delta) {
 		if (capture)
 			target.addCaptureListener(listener);
 		else
@@ -36,23 +34,23 @@ public class AddListenerAction extends Action {
 		return true;
 	}
 
-	public EventListener getListener() {
+	public EventListener getListener () {
 		return listener;
 	}
 
-	public void setListener(EventListener listener) {
+	public void setListener (EventListener listener) {
 		this.listener = listener;
 	}
 
-	public boolean getCapture() {
+	public boolean getCapture () {
 		return capture;
 	}
 
-	public void setCapture(boolean capture) {
+	public void setCapture (boolean capture) {
 		this.capture = capture;
 	}
 
-	public void reset() {
+	public void reset () {
 		super.reset();
 		listener = null;
 	}
