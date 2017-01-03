@@ -155,6 +155,28 @@ public class MObjectRef {
 	}
 
 	/**
+	 * Sets the sprite origin of the referenced MGameObject.
+	 * 
+	 * @param x
+	 *            The new X origin.
+	 * @param y
+	 *            The new Y origin.
+	 */
+	public void setOrigin(float x, float y) {
+		_owningScene.setGObjectSpriteOrigin(_name, x, y);
+	}
+
+	/**
+	 * Sets the sprite origin of the referenced MGameObject.
+	 * 
+	 * @param origin
+	 *            The new origin.
+	 */
+	public void setOrigin(Vector2 origin) {
+		_owningScene.setGObjectSpriteOrigin(_name, origin);
+	}
+
+	/**
 	 * Stop the referred MGameObject.
 	 */
 	public void stop() {
@@ -364,6 +386,15 @@ public class MObjectRef {
 	 */
 	public float getLinDamp() {
 		return _owningScene.getGObjectLinearDampening(_name);
+	}
+
+	/**
+	 * Gets the origin of the referenced MGameObject.
+	 * 
+	 * @return The referenced MGameObject's origin.
+	 */
+	public Vector2 getOrigin() {
+		return _owningScene.getGObjectSpriteOrigin(_name);
 	}
 
 	/**

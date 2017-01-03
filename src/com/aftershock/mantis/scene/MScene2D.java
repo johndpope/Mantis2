@@ -439,6 +439,48 @@ public class MScene2D extends Stage {
 	}
 
 	/**
+	 * Sets the origin of an object's render sprite.
+	 * 
+	 * @param name
+	 *            The name of the object to modify.
+	 * @param x
+	 *            The X origin of the object's render sprite.
+	 * @param y
+	 *            The Y origin of the object's render sprite.
+	 */
+	public void setGObjectSpriteOrigin(String name, float x, float y) {
+		doLater(() -> {
+			_objects.get(name).setSpriteOrigin(x, y);
+		});
+	}
+
+	/**
+	 * Sets the origin of an object's render sprite.
+	 * 
+	 * @param name
+	 *            The name of the object to modify.
+	 * 
+	 * @param origin
+	 *            The origin vector of the object's render sprite.
+	 */
+	public void setGObjectSpriteOrigin(String name, Vector2 origin) {
+		doLater(() -> {
+			_objects.get(name).setSpriteOrigin(origin);
+		});
+	}
+
+	/**
+	 * Gets the sprite origin of an object.
+	 * 
+	 * @param name
+	 *            The name of the object to poll.
+	 * @return The object's sprite render origin.
+	 */
+	public Vector2 getGObjectSpriteOrigin(String name) {
+		return _objects.get(name).getSpriteOrigin();
+	}
+
+	/**
 	 * Gets the rotation offset of a given object.
 	 * 
 	 * @param name

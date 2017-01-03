@@ -102,7 +102,7 @@ public class MGameObject extends Actor {
 
 			_body = world.createBody(bDef);
 			_body.setUserData(name);
-			_body.setTransform(initialPos.x, initialPos.y, 0.0f);
+			_body.setTransform(initialPos.x, initialPos.y, (float) Math.toRadians(-5));
 			_body.setSleepingAllowed(true);
 			_fixture = _body.createFixture(fDef);
 
@@ -166,6 +166,37 @@ public class MGameObject extends Actor {
 		if (_physical)
 			_drawSprite.translate(_drawSprite.getOriginX(), _drawSprite.getOriginY());
 		_drawSprite.draw(batch);
+	}
+
+	/**
+	 * Sets the origin of the render sprite.
+	 * 
+	 * @param x
+	 *            The X origin of the render sprite.
+	 * @param y
+	 *            The Y origin of the render sprite.
+	 */
+	public void setSpriteOrigin(float x, float y) {
+		_drawSprite.setOrigin(x, y);
+	}
+
+	/**
+	 * Sets the origin of the render sprite.
+	 * 
+	 * @param origin
+	 *            The origin vector of the render sprite.
+	 */
+	public void setSpriteOrigin(Vector2 origin) {
+		setSpriteOrigin(origin.x, origin.y);
+	}
+
+	/**
+	 * Gets the origin of the render sprite.
+	 * 
+	 * @return The render sprite's origin.
+	 */
+	public Vector2 getSpriteOrigin() {
+		return new Vector2(_drawSprite.getOriginX(), _drawSprite.getOriginY());
 	}
 
 	/**

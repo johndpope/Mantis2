@@ -61,10 +61,6 @@ public class MapLoader {
 						s.createGObject(name, BodyType.StaticBody, vec((xPos * SOX) / 2, (yPos * SOY) / 2).scl(scale),
 								vec(tileW + padding, tileH + padding).scl(scale), tile.getTextureRegion(), false, false,
 								cats[z], groups[z], masks[z], physical);
-						if (physical) {
-							s.setGObjectRot(name, -30);
-							s.setGObjectRotOffset(name, 30);
-						}
 					}
 				}
 
@@ -137,11 +133,11 @@ public class MapLoader {
 			smallestH = layer.getTileHeight();
 			prefixes[lNum] = layer.getName();
 			if (layer.getProperties().containsKey("cat"))
-				cats[lNum] = Integer.parseInt((String) layer.getProperties().get("cat"));
+				cats[lNum] = (int) layer.getProperties().get("cat");
 			if (layer.getProperties().containsKey("group"))
-				groups[lNum] = Integer.parseInt((String) layer.getProperties().get("group"));
+				groups[lNum] = (int) layer.getProperties().get("group");
 			if (layer.getProperties().containsKey("mask"))
-				masks[lNum] = Integer.parseInt((String) layer.getProperties().get("mask"));
+				masks[lNum] = (int) layer.getProperties().get("mask");
 			if (layer.getProperties().containsKey("sensor"))
 				sensors[lNum] = Boolean.parseBoolean((String) layer.getProperties().get("sensor"));
 
